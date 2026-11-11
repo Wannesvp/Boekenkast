@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn Boekenkast</title>
+<style>
+:root{--bg:#faf6ef;--card:#fff;--ink:#2b2118;--mut:#7a6c5d;--line:#e6dccb;--acc:#8a4b2a;--acc-ink:#fff;--chip:#efe5d3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1713;--card:#272019;--ink:#f1e8da;--mut:#a89a88;--line:#3a3025;--acc:#d98e5f;--acc-ink:#1c1713;--chip:#352b21;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1713;--card:#272019;--ink:#f1e8da;--mut:#a89a88;--line:#3a3025;--acc:#d98e5f;--acc-ink:#1c1713;--chip:#352b21;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,'Times New Roman',serif;max-width:720px;margin-inline:auto;padding:16px 16px 90px}
+h1{font-size:1.5rem;margin:4px 0 2px}
+.sub{color:var(--mut);font:.85rem system-ui,sans-serif;margin-bottom:12px}
+button,input,select,textarea{font:inherit;font-family:system-ui,sans-serif;color:var(--ink)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
+.chip{flex:none;border:1px solid var(--line);background:var(--chip);border-radius:20px;padding:6px 14px;cursor:pointer;font-size:.9rem}
+.chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.chip.add{background:none;border-style:dashed}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.bar input{flex:1 1 100%}
+.bar select{flex:1}
+input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+.albbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;font:.9rem system-ui,sans-serif;color:var(--mut)}
+.link{background:none;border:none;color:var(--acc);cursor:pointer;padding:2px 4px;text-decoration:underline}
+.book{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
+.cover{flex:none;width:52px;height:76px;border-radius:4px 8px 8px 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.4rem;box-shadow:inset 4px 0 0 rgba(0,0,0,.2)}
+.info{min-width:0;flex:1}
+.cover{position:relative;overflow:hidden}.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.t{font-weight:bold}
+.a{color:var(--mut);font-size:.9rem}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font:.75rem system-ui,sans-serif}
+.tag{background:var(--chip);border-radius:10px;padding:2px 8px}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--acc);color:var(--acc-ink);border:none;border-radius:28px;padding:14px 20px;font-weight:bold;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer}
+dialog{border:none;border-radius:14px;padding:18px;width:min(92vw,460px);background:var(--bg);color:var(--ink);max-height:90vh}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+label{display:block;font:.8rem system-ui,sans-serif;color:var(--mut);margin:10px 0 3px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.albs{display:flex;flex-wrap:wrap;gap:6px}
+.albs label{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);background:var(--chip);border-radius:16px;padding:5px 10px}
+.albs input{width:auto}
+.acts{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:10px;cursor:pointer}
+.btn.p{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:bold}
+.btn.d{color:#c0392b}
+.isbnrow{display:flex;gap:8px}.isbnrow input{flex:1}.isbnrow .btn{flex:none;padding:9px 12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:none;padding:8px 14px;cursor:pointer;font:600 .95rem system-ui,sans-serif;color:var(--mut);border-bottom:3px solid transparent}
+.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+.rk{align-items:center}.pos{flex:none;width:30px;text-align:center;font:bold 1.2rem Georgia,serif;color:var(--acc)}
+.rr{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font:.8rem system-ui,sans-serif;color:var(--mut)}.st{color:var(--acc);letter-spacing:1px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.head .btn{flex:none;padding:6px 12px;font-size:.85rem;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;font-family:system-ui,sans-serif}
+.card .btn{width:100%;cursor:pointer}.card p{margin:4px 0 10px}.card .a{margin-top:4px}
+.foot{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:.85rem system-ui,sans-serif;color:var(--mut)}
+.foot .btn{flex:none;padding:8px 12px;font-size:.85rem;color:var(--ink);margin:0;text-align:center;cursor:pointer}
+.foot>div{flex:1 1 100%}
+</style>
+</head>
+<body>
+<div class="head"><h1>📚 Mijn Boekenkast</h1><button class="btn" id="accBtn" style="display:none">👤 Inloggen</button></div>
+<div class="sub" id="stats"></div>
+<div class="tabs"><button class="tab on" data-v="lib">📚 Bibliotheek</button><button class="tab" data-v="rank">🏆 Ranglijst</button></div>
+<div id="viewLib">
+<div class="chips" id="chips"></div>
+<div class="albbar" id="albbar"></div>
+<div class="bar">
+  <input id="q" type="search" placeholder="Zoek op titel of auteur…">
+  <select id="fs"><option value="">Alle statussen</option><option value="gelezen">Gelezen</option><option value="bezig">Bezig</option><option value="nog te lezen">Nog te lezen</option></select>
+  <select id="ff"><option value="">Alle formaten</option><option value="fysiek">Fysiek</option><option value="e-book">E-book</option><option value="audio">Audio</option></select>
+</div>
+<div id="list"></div>
+</div>
+<div id="viewRank" style="display:none">
+  <div class="bar"><select id="rk_by"><option value="rating">Sorteer op: mijn rating</option><option value="rec">Sorteer op: aanbeveling</option></select><select id="rk_alb"></select></div>
+  <div id="rk_list"></div>
+</div>
+<div id="viewAcc" style="display:none">
+ <div id="acc_out" class="card"><b>Je gebruikt de app zonder account.</b><p class="a">Je boeken staan alleen op dit apparaat. Met een account staan ze veilig online en kun je op meerdere apparaten inloggen.</p><button class="btn p" id="acc_login">Inloggen of account aanmaken</button></div>
+ <div id="acc_in">
+  <div class="card"><b>Ingelogd als</b><div id="acc_mail" class="a"></div><div id="acc_sync" class="a"></div></div>
+  <div class="card"><b>Wachtwoord</b><p class="a">Kies een nieuw wachtwoord voor je account.</p><button class="btn" id="acc_pw">Wachtwoord wijzigen</button></div>
+  <div class="card"><b>E-mailadres wijzigen</b><p class="a">Je krijgt een bevestigingsmail om het nieuwe adres te activeren.</p><input id="acc_newmail" type="email" placeholder="nieuw@adres.nl"><button class="btn" id="acc_mailbtn" style="margin-top:8px">Wijzig e-mailadres</button><div id="acc_mmsg" class="a"></div></div>
+  <div class="card"><b>Mijn gegevens</b><p class="a">Download alles wat je hebt opgeslagen, of begin opnieuw met een lege bibliotheek.</p><div class="row"><button class="btn" id="acc_export">⬇️ Exporteer</button><button class="btn d" id="acc_wipe">Leeg bibliotheek</button></div><div id="acc_gmsg" class="a"></div></div>
+  <div class="card"><button class="btn" id="acc_logout">Uitloggen</button></div>
+  <div class="card"><b style="color:#c0392b">Account verwijderen</b><p class="a">Verwijdert je account en al je gegevens definitief.</p><input id="acc_delconf" placeholder="Typ VERWIJDER om te bevestigen"><button class="btn d" id="acc_del" style="margin-top:8px">Verwijder account</button><div id="acc_dmsg" class="a"></div></div>
+ </div>
+</div>
+<div class="foot"><div>Je boeken staan alleen in deze browser op dit apparaat, tenzij je inlogt. Maak regelmatig een back-up.</div>
+<button class="btn" id="exp">⬇️ Exporteer</button><label class="btn" for="imp">⬆️ Importeer</label>
+<input type="file" id="imp" accept="application/json,.json" style="position:absolute;opacity:0;width:1px;height:1px"><div id="impmsg"></div></div>
+<button class="fab" id="addBook">+ Boek</button>
+
+<dialog id="bd"><form method="dialog" id="bf" onsubmit="return false">
+  <h2 id="bt" style="margin:0 0 4px;font-size:1.2rem">Boek</h2>
+  <label>Titel</label><input id="f_title" required>
+  <label>Auteur</label><input id="f_author">
+  <label>ISBN</label><div class="isbnrow"><input id="f_isbn" inputmode="numeric" placeholder="978…"><button type="button" class="btn" id="f_lookup">Opzoeken</button></div>
+  <div id="lmsg" style="font:.85rem system-ui,sans-serif;color:var(--mut);margin-top:6px"></div>
+  <div class="row"><div><label>Uitgever</label><input id="f_pub"></div><div><label>Jaar</label><input id="f_year" inputmode="numeric"></div><div><label>Pagina’s</label><input id="f_pages" inputmode="numeric"></div></div>
+  <div class="row"><div><label>Status</label><select id="f_status"><option>nog te lezen</option><option>bezig</option><option>gelezen</option></select></div>
+  <div><label>Formaat</label><select id="f_format"><option>fysiek</option><option>e-book</option><option>audio</option></select></div></div>
+  <label>Plek in kast (bij fysiek)</label><input id="f_shelf" placeholder="bijv. kast 2, plank 3">
+  <div class="row"><div><label>Beoordeling</label><select id="f_rating"><option value="0">–</option><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option><option value="4">★★★★</option><option value="5">★★★★★</option></select></div>
+  <div><label>Datum gelezen</label><input type="date" id="f_date"></div></div>
+  <div class="row"><div><label>Aanbeveling aan anderen</label><select id="f_rec"><option value="0">–</option><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option><option value="4">★★★★</option><option value="5">★★★★★</option></select></div></div>
+  <label>Aanraden aan wie / waarom</label><input id="f_recfor" placeholder="bijv. voor wie van psychologie houdt">
+  <label>Albums</label><div class="albs" id="f_albs"></div>
+  <label>Notities</label><textarea id="f_notes" rows="3"></textarea>
+  <div class="acts"><button type="button" class="btn d" id="del">Verwijder</button><button type="button" class="btn" id="cancel">Annuleer</button><button type="button" class="btn p" id="save">Bewaar</button></div>
+</form></dialog>
+
+<dialog id="ad"><form method="dialog" onsubmit="return false">
+  <h2 id="at" style="margin:0 0 4px;font-size:1.2rem">Album</h2>
+  <label>Naam</label><input id="a_name">
+  <div class="acts"><button type="button" class="btn" id="a_cancel">Annuleer</button><button type="button" class="btn p" id="a_save">Bewaar</button></div>
+</form></dialog>
+
+<dialog id="authd"><form method="dialog" onsubmit="return false">
+  <h2 id="au_t" style="margin:0 0 4px;font-size:1.2rem">Inloggen</h2>
+  <div id="au_e"><label>E-mailadres</label><input id="au_email" type="email" autocomplete="email" inputmode="email"></div>
+  <div id="au_p"><label id="au_pl">Wachtwoord</label><input id="au_pass" type="password" autocomplete="current-password"></div>
+  <div id="au_p2" style="display:none"><label>Herhaal wachtwoord</label><input id="au_pass2" type="password" autocomplete="new-password"></div>
+  <div id="au_msg" style="font:.85rem system-ui,sans-serif;color:var(--mut);margin-top:10px;min-height:1.2em"></div>
+  <div class="acts"><button type="button" class="btn" id="au_close">Sluiten</button><button type="button" class="btn p" id="au_go">Inloggen</button></div>
+  <div id="au_links" style="margin-top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;font:.9rem system-ui,sans-serif"><button type="button" class="link" id="au_l1"></button><button type="button" class="link" id="au_l2"></button></div>
+</form></dialog>
+
+<script>
+const KEY='boekenkast-v1';
+const uid=()=>Math.random().toString(36).slice(2,10);
+let S={albums:[{id:'a1',name:'Fysieke boekenkast'},{id:'a2',name:'Digitaal'},{id:'a3',name:'Wishlist'}],
+ books:[{id:'b1',title:'Voorbeeldboek',author:'Een Auteur',status:'nog te lezen',format:'fysiek',shelf:'kast 1, plank 1',rating:0,date:'',notes:'',albums:['a1']}]};
+try{const r=localStorage.getItem(KEY);if(r)S=JSON.parse(r)}catch(e){}
+let sb=null,user=null,cloudReady=false,saveT=null;
+const save=()=>{
+  if(user){if(cloudReady){clearTimeout(saveT);saveT=setTimeout(pushCloud,600)}return}
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+/* Vooraf ingevulde boeken: worden één keer toegevoegd en komen niet terug als je ze verwijdert */
+const cov=i=>'https://covers.openlibrary.org/b/isbn/'+i+'-M.jpg?default=false';
+const SEED=[
+ {id:'seed-1',title:'The Courage to Be Disliked',author:'Ichiro Kishimi, Fumitake Koga',isbn:'9781760630737',pub:'Allen & Unwin',year:'2019',pages:'288',notes:'Engelstalig, paperback.'},
+ {id:'seed-2',title:'Life in Perspective: The Art and Power of the Annual Life Review',author:'Tiago Forte',isbn:'9781805224044',pub:'Profile Books',year:'2026',pages:'288',notes:'Engelstalig, paperback.'},
+ {id:'seed-3',title:'Hábitos atómicos: Cambios pequeños, resultados extraordinarios',author:'James Clear',isbn:'9788418118036',pub:'Diana (Planeta)',year:'2020',pages:'336',notes:'Spaanstalig (vertaling van Atomic Habits). Controleer de editie via de barcode.'},
+ {id:'seed-4',title:'What’s Your Dream?: Find Your Passion. Love Your Work. Build a Richer Life.',author:'Simon Squibb',isbn:'9781804950807',pub:'Cornerstone (Penguin)',year:'2026',pages:'304',notes:'Engelstalig, paperback. Controleer de editie via de barcode.'},
+ {id:'seed-5',title:'The Courage to Be Happy',author:'Ichiro Kishimi, Fumitake Koga',isbn:'9781760529710',pub:'Allen & Unwin',year:'2019',pages:'272',status:'gelezen',date:'2025-05-10',rating:4,rec:4,recFor:'Voor wie The Courage to Be Disliked goed vond',notes:'Vervolg op The Courage to Be Disliked.'},
+ {id:'seed-6',title:'Building a Second Brain',author:'Tiago Forte',isbn:'9781800812222',pub:'Profile Books',year:'2023',pages:'272',format:'e-book',status:'gelezen',date:'2025-09-01',rating:4,rec:5,recFor:'Voor wie digitale notities en ideeën wil ordenen',al:['a2']},
+ {id:'seed-7',title:'The PARA Method',author:'Tiago Forte',isbn:'9781800819542',pub:'Profile Books',year:'2023',pages:'208',format:'e-book',status:'gelezen',date:'2025-10-12',rating:3,rec:3,recFor:'Handig als kort naslagwerk bij Building a Second Brain',al:['a2']},
+ {id:'seed-8',title:'Atomic Habits',author:'James Clear',isbn:'9781847941831',pub:'Random House Business',year:'2018',pages:'320',status:'gelezen',date:'2024-11-05',rating:5,rec:5,recFor:'Voor iedereen die routines wil opbouwen',notes:'Engelstalige versie van Hábitos atómicos. Controleer ISBN.'},
+ {id:'seed-9',title:'Hábitos atómicos en acción',author:'James Clear',isbn:'9788411193016',pub:'Diana (Planeta)',year:'2025',pages:'352',status:'nog te lezen',notes:'Werkboek bij Hábitos atómicos.'},
+ {id:'seed-10',title:'Deep Work',author:'Cal Newport',isbn:'9780349413686',pub:'Piatkus',year:'2016',pages:'304',status:'gelezen',date:'2025-02-18',rating:4,rec:4,recFor:'Voor wie beter wil focussen',notes:'Controleer ISBN.'},
+ {id:'seed-11',title:'Man’s Search for Meaning',author:'Viktor E. Frankl',isbn:'9781846046247',pub:'Rider',year:'2008',pages:'160',status:'gelezen',date:'2024-08-22',rating:5,rec:5,recFor:'Voor iedereen, zeker bij zingevingsvragen',notes:'Controleer ISBN.'},
+ {id:'seed-12',title:'Ikigai',author:'Héctor García, Francesc Miralles',isbn:'9781786330895',pub:'Hutchinson',year:'2017',pages:'208',status:'gelezen',date:'2025-04-03',rating:3,rec:3,recFor:'Luchtig en snel gelezen, voor wie zijn drijfveer zoekt',notes:'Controleer ISBN.'},
+ {id:'seed-13',title:'Designing Your Life',author:'Bill Burnett, Dave Evans',isbn:'9781101875322',pub:'Knopf',year:'2016',pages:'256',status:'bezig',rating:4,rec:4,recFor:'Voor wie voor een carrière- of levenskeuze staat',notes:'Controleer ISBN.'},
+ {id:'seed-14',title:'Zero to One',author:'Peter Thiel, Blake Masters',isbn:'9780804139298',pub:'Crown Business',year:'2014',pages:'224',status:'nog te lezen',al:['a3'],notes:'Controleer ISBN.'}
+];
+function seedState(){try{S.seeded=S.seeded||[];
+ SEED.forEach(b=>{if(S.seeded.includes(b.id))return;S.seeded.push(b.id);
+  if(S.books.some(x=>x.isbn===b.isbn))return;
+  S.books.push({status:'nog te lezen',format:'fysiek',shelf:'',rating:0,date:'',cover:cov(b.isbn),...b,albums:(b.al||['a1']).filter(id=>S.albums.some(a=>a.id===id))})});
+ S.patched=S.patched||[];
+ if(!S.patched.includes('ratings-v1')){S.patched.push('ratings-v1');
+  const P={'seed-1':{status:'gelezen',date:'2025-03-14',rating:5,rec:5,recFor:'Voor wie van psychologie en filosofie houdt'},
+   'seed-2':{status:'bezig',rating:4,rec:4,recFor:'Voor wie aan de slag wil met een jaarlijkse terugblik'},
+   'seed-3':{status:'gelezen',date:'2025-07-02',rating:4,rec:5,recFor:'Voor iedereen die routines wil opbouwen (Spaanstalig)'},
+   'seed-4':{status:'gelezen',date:'2026-01-20',rating:3,rec:4,recFor:'Voor wie een duwtje nodig heeft om te beginnen'}};
+  S.books.forEach(b=>{const p=P[b.id];if(p&&!b.rating&&!b.rec)Object.assign(b,p)})}
+}catch(e){}}
+seedState();save();
+let cur='all',editB=null,editA=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const col=t=>{let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))%360;return `hsl(${h} 35% 38%)`};
+
+function render(){
+  const n=s=>S.books.filter(b=>b.status===s).length;
+  $('stats').textContent=`${S.books.length} boeken · ${n('gelezen')} gelezen · ${n('bezig')} bezig · ${n('nog te lezen')} nog te lezen`;
+  const cnt=id=>S.books.filter(b=>b.albums.includes(id)).length;
+  $('chips').innerHTML=`<button class="chip ${cur==='all'?'on':''}" data-a="all">Alle (${S.books.length})</button>`+
+    S.albums.map(a=>`<button class="chip ${cur===a.id?'on':''}" data-a="${a.id}">${esc(a.name)} (${cnt(a.id)})</button>`).join('')+
+    `<button class="chip add" id="newAlb">+ Album</button>`;
+  const al=S.albums.find(a=>a.id===cur);
+  $('albbar').innerHTML=al?`<span>Album: <b>${esc(al.name)}</b></span><button class="link" id="renAlb">Hernoem</button><button class="link" id="delAlb">Verwijder album</button>`:'';
+  const q=$('q').value.toLowerCase(),fs=$('fs').value,ff=$('ff').value;
+  const L=S.books.filter(b=>(cur==='all'||b.albums.includes(cur))&&(!fs||b.status===fs)&&(!ff||b.format===ff)&&
+    (b.title+' '+b.author+' '+(b.isbn||'')).toLowerCase().includes(q)).sort((a,b)=>a.title.localeCompare(b.title));
+  $('list').innerHTML=L.length?L.map(b=>`<div class="book" data-b="${b.id}"><div class="cover" style="background:${col(b.title)}">${esc(b.title[0]||'?').toUpperCase()}${b.cover?`<img src="${esc(b.cover)}" alt="" onerror="this.remove()">`:''}</div>
+   <div class="info"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div>
+   <div class="meta"><span class="tag">${esc(b.status)}</span><span class="tag">${esc(b.format)}</span>${b.shelf&&b.format==='fysiek'?`<span class="tag">📍 ${esc(b.shelf)}</span>`:''}${b.year?`<span class="tag">${esc(b.year)}</span>`:''}${b.pages?`<span class="tag">${esc(b.pages)} blz.</span>`:''}${b.rec?`<span class="tag">👥 ${'★'.repeat(b.rec)}</span>`:''}${b.rating?`<span class="tag">${'★'.repeat(b.rating)}</span>`:''}</div></div></div>`).join(''):
+   '<div class="empty">Geen boeken gevonden.<br>Tik op “+ Boek” om er een toe te voegen.</div>';
+}
+
+$('chips').onclick=e=>{const t=e.target.closest('button');if(!t)return;
+  if(t.id==='newAlb'){openAlb(null)}else{cur=t.dataset.a;render()}};
+$('albbar').onclick=e=>{const t=e.target.id;
+  if(t==='renAlb')openAlb(S.albums.find(a=>a.id===cur));
+  if(t==='delAlb'&&confirm('Album verwijderen? De boeken zelf blijven bewaard.')){
+    S.books.forEach(b=>b.albums=b.albums.filter(x=>x!==cur));S.albums=S.albums.filter(a=>a.id!==cur);cur='all';save();render()}};
+['q','fs','ff'].forEach(i=>$(i).oninput=render);
+
+function openAlb(a){editA=a;$('at').textContent=a?'Album hernoemen':'Nieuw album';$('a_name').value=a?a.name:'';$('ad').showModal();$('a_name').focus()}
+$('a_cancel').onclick=()=>$('ad').close();
+$('a_save').onclick=()=>{const n=$('a_name').value.trim();if(!n)return;
+  if(editA)editA.name=n;else{const a={id:uid(),name:n};S.albums.push(a);cur=a.id}
+  save();$('ad').close();render()};
+
+function openBook(b){
+  editB=b;$('bt').textContent=b?'Boek bewerken':'Nieuw boek';
+  const v=b||{title:'',author:'',isbn:'',status:'nog te lezen',format:'fysiek',shelf:'',rating:0,date:'',notes:'',albums:cur!=='all'?[cur]:[]};
+  $('f_title').value=v.title;$('f_author').value=v.author;$('f_isbn').value=v.isbn||'';$('f_pub').value=v.pub||'';$('f_year').value=v.year||'';$('f_pages').value=v.pages||'';curCover=v.cover||'';$('lmsg').textContent='';$('f_rec').value=v.rec||0;$('f_recfor').value=v.recFor||'';$('f_status').value=v.status;$('f_format').value=v.format;
+  $('f_shelf').value=v.shelf;$('f_rating').value=v.rating;$('f_date').value=v.date;$('f_notes').value=v.notes;
+  $('f_albs').innerHTML=S.albums.length?S.albums.map(a=>`<label><input type="checkbox" value="${a.id}" ${v.albums.includes(a.id)?'checked':''}>${esc(a.name)}</label>`).join(''):'<span class="a">Nog geen albums.</span>';
+  $('del').style.display=b?'':'none';$('bd').showModal();
+}
+$('addBook').onclick=()=>openBook(null);
+$('list').onclick=e=>{const c=e.target.closest('.book');if(c)openBook(S.books.find(b=>b.id===c.dataset.b))};
+$('cancel').onclick=()=>$('bd').close();
+$('del').onclick=()=>{if(confirm('Dit boek verwijderen?')){S.books=S.books.filter(b=>b!==editB);save();$('bd').close();render()}};
+$('save').onclick=()=>{
+  const title=$('f_title').value.trim();if(!title){$('f_title').focus();return}
+  const d={title,author:$('f_author').value.trim(),isbn:cleanIsbn($('f_isbn').value),pub:$('f_pub').value.trim(),year:$('f_year').value.trim(),pages:$('f_pages').value.trim(),cover:curCover,rec:+$('f_rec').value,recFor:$('f_recfor').value.trim(),status:$('f_status').value,format:$('f_format').value,shelf:$('f_shelf').value.trim(),
+    rating:+$('f_rating').value,date:$('f_date').value,notes:$('f_notes').value.trim(),
+    albums:[...document.querySelectorAll('#f_albs input:checked')].map(i=>i.value)};
+  if(editB)Object.assign(editB,d);else S.books.push({id:uid(),...d});
+  save();$('bd').close();render()};
+/* ---- ISBN opzoeken ---- */
+const cleanIsbn=s=>String(s||'').replace(/[^0-9Xx]/g,'').toUpperCase();
+let curCover='';
+const getJson=async u=>{const r=await fetch(u);if(!r.ok)throw 0;return r.json()};
+const yr=d=>(String(d||'').match(/\d{4}/)||[''])[0];
+async function lookup(i){
+  try{const d=await getJson('https://openlibrary.org/api/books?bibkeys=ISBN:'+i+'&format=json&jscmd=data');const b=d['ISBN:'+i];
+    if(b)return{title:[b.title,b.subtitle].filter(Boolean).join(': '),author:(b.authors||[]).map(a=>a.name).join(', '),
+      pub:(b.publishers||[]).map(p=>p.name).join(', '),year:yr(b.publish_date),pages:b.number_of_pages||'',
+      cover:b.cover?(b.cover.medium||b.cover.small||''):''}}catch(e){}
+  try{const d=await getJson('https://www.googleapis.com/books/v1/volumes?q=isbn:'+i);
+    const v=d.items&&d.items[0]&&d.items[0].volumeInfo;
+    if(v)return{title:[v.title,v.subtitle].filter(Boolean).join(': '),author:(v.authors||[]).join(', '),pub:v.publisher||'',
+      year:yr(v.publishedDate),pages:v.pageCount||'',cover:v.imageLinks?(v.imageLinks.thumbnail||'').replace('http:','https:'):''}}catch(e){}
+  return null}
+$('f_lookup').onclick=async()=>{
+  const i=cleanIsbn($('f_isbn').value),m=$('lmsg');
+  if(i.length!==10&&i.length!==13){m.textContent='Vul een ISBN van 10 of 13 cijfers in.';return}
+  const dup=S.books.find(x=>x.isbn===i&&x!==editB);
+  if(dup){m.textContent='Dit boek staat al in je bibliotheek: '+dup.title;return}
+  m.textContent='Zoeken…';
+  const r=await lookup(i);
+  if(!r){m.textContent='Niets gevonden of geen verbinding. Vul de gegevens zelf in.';return}
+  const set=(id,v)=>{if(v&&!$(id).value.trim())$(id).value=v};
+  set('f_title',r.title);set('f_author',r.author);set('f_pub',r.pub);set('f_year',r.year);set('f_pages',r.pages);
+  if(r.cover)curCover=r.cover;
+  m.textContent='Gegevens ingevuld. Controleer ze even.'};
+$('f_isbn').oninput=()=>{$('lmsg').textContent='';if(cleanIsbn($('f_isbn').value).length===13)$('f_lookup').click()};
+/* ---- Ranglijst ---- */
+let view='lib';
+const stars=n=>n?'★'.repeat(n)+'☆'.repeat(5-n):'–';
+function setView(v){view=v;$('viewLib').style.display=v==='lib'?'':'none';$('viewRank').style.display=v==='rank'?'':'none';
+  $('addBook').style.display=v==='lib'?'':'none';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));if(v==='rank')renderRank()}
+document.querySelector('.tabs').onclick=e=>{const t=e.target.closest('.tab');if(t)setView(t.dataset.v)};
+function renderRank(){
+  const sel=$('rk_alb'),old=sel.value||'all';
+  sel.innerHTML='<option value="all">Alle albums</option>'+S.albums.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
+  sel.value=(old==='all'||S.albums.some(a=>a.id===old))?old:'all';
+  const by=$('rk_by').value,other=by==='rating'?'rec':'rating',al=sel.value;
+  const inA=S.books.filter(b=>al==='all'||b.albums.includes(al));
+  const rated=inA.filter(b=>b[by]>0).sort((a,b)=>b[by]-a[by]||(b[other]||0)-(a[other]||0)||a.title.localeCompare(b.title));
+  const n=inA.length-rated.length,lbl=by==='rating'?'rating':'aanbeveling';
+  $('rk_list').innerHTML=(rated.length?rated.map((b,i)=>`<div class="book rk" data-b="${b.id}"><div class="pos">${i+1}</div><div class="info"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div>
+    <div class="rr"><span>Mijn rating <b class="st">${stars(b.rating||0)}</b></span><span>Aanbeveling <b class="st">${stars(b.rec||0)}</b></span></div>${b.recFor?`<div class="a">👥 ${esc(b.recFor)}</div>`:''}</div></div>`).join(''):`<div class="empty">Nog geen boeken met een ${lbl} in deze selectie.<br>Vul die in bij een boek.</div>`)+
+    (n&&rated.length?`<div class="sub" style="text-align:center">${n} ${n>1?'boeken':'boek'} zonder ${lbl} niet getoond</div>`:'');
+}
+$('rk_by').onchange=$('rk_alb').onchange=renderRank;
+$('rk_list').onclick=e=>{const c=e.target.closest('.book');if(c){setView('lib');openBook(S.books.find(b=>b.id===c.dataset.b))}};
+/* ---- Back-up ---- */
+$('exp').onclick=()=>{
+  const blob=new Blob([JSON.stringify({app:'boekenkast',version:1,albums:S.albums,books:S.books},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='boekenkast-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  $('impmsg').textContent='Back-up gedownload.'};
+$('imp').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(!Array.isArray(d.books)||!Array.isArray(d.albums))throw 0;
+    if(!confirm('Importeren voegt maximaal '+d.books.length+' boeken en '+d.albums.length+' albums toe aan je bibliotheek. Doorgaan?'))return;
+    const map={};
+    d.albums.forEach(a=>{if(!a||!a.id||!a.name)return;
+      const ex=S.albums.find(x=>x.id===a.id)||S.albums.find(x=>x.name.toLowerCase()===String(a.name).toLowerCase());
+      if(ex)map[a.id]=ex.id;else{S.albums.push({id:String(a.id),name:String(a.name)});map[a.id]=String(a.id)}});
+    let add=0;
+    d.books.forEach(b=>{if(!b||!b.title)return;
+      if(S.books.some(x=>x.id===b.id||(b.isbn&&x.isbn===b.isbn)))return;
+      S.books.push({...b,id:b.id||uid(),albums:(b.albums||[]).map(i=>map[i]).filter(Boolean)});add++});
+    save();render();$('impmsg').textContent=add+' boeken toegevoegd.';
+  }catch(x){$('impmsg').textContent='Dit bestand kon niet gelezen worden.'}};
+
+/* ---- Account (Supabase) ---- */
+const SUPA_URL='https://royduysrzjvkzhmrxhsl.supabase.co';   /* vul hier je Project URL in */
+const SUPA_KEY='sb_publishable_uXPDhLRxiqdRJD8989a-gQ_pacf77cb';   /* vul hier je anon/publishable key in */
+const fresh=()=>({albums:[{id:'a1',name:'Fysieke boekenkast'},{id:'a2',name:'Digitaal'},{id:'a3',name:'Wishlist'}],books:[]});
+function loadLocal(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):fresh()}catch(e){S=fresh()}seedState()}
+const setSync=m=>{const e=$('acc_sync');if(e)e.textContent=m};
+const updAccBtn=()=>{$('accBtn').textContent=user?'👤 Account':'👤 Inloggen'};
+async function pushCloud(){
+  if(!sb||!user)return;setSync('Opslaan…');
+  const {error}=await sb.from('libraries').upsert({user_id:user.id,data:{albums:S.albums,books:S.books,seeded:S.seeded||[],patched:S.patched||[]},updated_at:new Date().toISOString()});
+  setSync(error?'⚠️ Opslaan mislukt. Controleer je verbinding.':'✓ Opgeslagen')}
+async function loadCloud(){
+  const {data,error}=await sb.from('libraries').select('data').eq('user_id',user.id).maybeSingle();
+  if(error){setSync('⚠️ Laden mislukt');return false}
+  if(data&&data.data&&Array.isArray(data.data.books)){const d=data.data;S={albums:d.albums||[],books:d.books,seeded:d.seeded||[],patched:d.patched||[]};seedState()}
+  else{S=fresh();seedState();await pushCloud()}
+  return true}
+function handleSession(session){
+  if(session&&session.user){
+    if(user&&user.id===session.user.id){user=session.user;return}
+    user=session.user;cloudReady=false;S=fresh();render();updAccBtn();
+    setTimeout(async()=>{const ok=await loadCloud();cloudReady=ok;render();
+      if(!ok)alert('Je bibliotheek kon niet geladen worden. Er is niets overschreven. Probeer het later opnieuw.')},0);
+  }else if(user){user=null;cloudReady=false;loadLocal();updAccBtn();render();setView('lib')}
+  updAccBtn()}
+
+let amode='login';
+function openAuth(m){
+  amode=m;
+  const T={login:'Inloggen',register:'Account aanmaken',forgot:'Wachtwoord vergeten',newpw:'Nieuw wachtwoord instellen'};
+  const G={login:'Inloggen',register:'Account aanmaken',forgot:'Stuur herstelmail',newpw:'Wachtwoord opslaan'};
+  $('au_t').textContent=T[m];$('au_go').textContent=G[m];
+  $('au_e').style.display=m==='newpw'?'none':'';
+  $('au_p').style.display=m==='forgot'?'none':'';
+  $('au_p2').style.display=(m==='register'||m==='newpw')?'':'none';
+  $('au_pl').textContent=m==='newpw'?'Nieuw wachtwoord (minstens 8 tekens)':(m==='register'?'Wachtwoord (minstens 8 tekens)':'Wachtwoord');
+  $('au_pass').autocomplete=m==='login'?'current-password':'new-password';
+  $('au_msg').textContent='';$('au_pass').value='';$('au_pass2').value='';
+  $('au_links').style.display=m==='newpw'?'none':'';
+  $('au_l1').textContent=m==='login'?'Nog geen account? Maak er een aan':'Terug naar inloggen';
+  $('au_l1').onclick=()=>openAuth(m==='login'?'register':'login');
+  $('au_l2').style.display=m==='login'?'':'none';$('au_l2').textContent='Wachtwoord vergeten?';$('au_l2').onclick=()=>openAuth('forgot');
+  if(!$('authd').open)$('authd').showModal()}
+$('au_close').onclick=()=>$('authd').close();
+$('authd').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();$('au_go').click()}});
+$('au_go').onclick=async()=>{
+  const email=$('au_email').value.trim(),pw=$('au_pass').value,say=t=>{$('au_msg').textContent=t};
+  const back=location.origin+location.pathname;
+  try{
+    if(amode==='login'){
+      if(!email||!pw)return say('Vul je e-mailadres en wachtwoord in.');
+      const {error}=await sb.auth.signInWithPassword({email,password:pw});
+      if(error)return say('Inloggen mislukt. Controleer je gegevens, of bevestig eerst je e-mailadres.');
+      $('authd').close();
+    }else if(amode==='register'){
+      if(!email)return say('Vul je e-mailadres in.');
+      if(pw.length<8)return say('Kies een wachtwoord van minstens 8 tekens.');
+      if(pw!==$('au_pass2').value)return say('De wachtwoorden komen niet overeen.');
+      const {data,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:back}});
+      if(error)return say('Aanmaken mislukt: '+error.message);
+      if(data.session)$('authd').close();else say('Check je mailbox en klik op de bevestigingslink om je account te activeren.');
+    }else if(amode==='forgot'){
+      if(!email)return say('Vul je e-mailadres in.');
+      const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:back});
+      if(error)return say('Versturen mislukt: '+error.message);
+      say('Als dit adres bij een account hoort, is er een mail met een herstellink verstuurd.');
+    }else{
+      if(pw.length<8)return say('Kies een wachtwoord van minstens 8 tekens.');
+      if(pw!==$('au_pass2').value)return say('De wachtwoorden komen niet overeen.');
+      const {error}=await sb.auth.updateUser({password:pw});
+      if(error)return say('Opslaan mislukt: '+error.message);
+      say('Je wachtwoord is gewijzigd.');setTimeout(()=>$('authd').close(),1200);
+    }
+  }catch(x){say('Er ging iets mis. Probeer het opnieuw.')}};
+
+const _sv=setView;
+setView=function(v){_sv(v);$('viewAcc').style.display=v==='acc'?'':'none';if(v==='acc')renderAcc()};
+function renderAcc(){
+  $('acc_out').style.display=user?'none':'';$('acc_in').style.display=user?'':'none';
+  if(user)$('acc_mail').textContent=user.email}
+$('accBtn').onclick=()=>user?setView('acc'):openAuth('login');
+$('acc_login').onclick=()=>openAuth('login');
+$('acc_pw').onclick=()=>openAuth('newpw');
+$('acc_logout').onclick=async()=>{await sb.auth.signOut()};
+$('acc_export').onclick=()=>$('exp').click();
+$('acc_mailbtn').onclick=async()=>{
+  const e=$('acc_newmail').value.trim(),m=$('acc_mmsg');if(!e)return;
+  const {error}=await sb.auth.updateUser({email:e},{emailRedirectTo:location.origin+location.pathname});
+  m.textContent=error?'Wijzigen mislukt: '+error.message:'Er is een bevestigingsmail verstuurd. Klik op de link om je nieuwe adres te activeren.'};
+$('acc_wipe').onclick=()=>{
+  if(!confirm('Alle boeken en albums uit je account verwijderen? Dit kan niet ongedaan gemaakt worden.'))return;
+  S=fresh();S.seeded=SEED.map(b=>b.id);S.patched=['ratings-v1'];save();render();$('acc_gmsg').textContent='Je bibliotheek is leeggemaakt.'};
+$('acc_del').onclick=async()=>{
+  const m=$('acc_dmsg');
+  if($('acc_delconf').value.trim().toUpperCase()!=='VERWIJDER'){m.textContent='Typ VERWIJDER om te bevestigen.';return}
+  const {error}=await sb.rpc('delete_my_account');
+  if(error){m.textContent='Verwijderen mislukt: '+error.message;return}
+  await sb.auth.signOut({scope:'local'});alert('Je account en al je gegevens zijn verwijderd.')};
+
+(async()=>{
+  if(!SUPA_URL||!SUPA_KEY)return;
+  try{
+    await new Promise((res,rej)=>{const sc=document.createElement('script');
+      sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)});
+    sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+    $('accBtn').style.display='';
+    sb.auth.onAuthStateChange((ev,session)=>{
+      if(ev==='PASSWORD_RECOVERY')setTimeout(()=>openAuth('newpw'),0);
+      handleSession(session)});
+  }catch(e){}
+})();
+const _render=render;render=function(){_render();if(view==='rank')renderRank()};
+render();
+</script>
+</body>
+</html>

@@ -59,6 +59,11 @@ label{display:block;font:.8rem system-ui,sans-serif;color:var(--mut);margin:10px
 .foot{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:.85rem system-ui,sans-serif;color:var(--mut)}
 .foot .btn{flex:none;padding:8px 12px;font-size:.85rem;color:var(--ink);margin:0;text-align:center;cursor:pointer}
 .foot>div{flex:1 1 100%}
+.note{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-family:system-ui,sans-serif}
+.note .q{border-left:3px solid var(--acc);padding-left:8px;margin:6px 0;color:var(--mut);font-style:italic;font-family:Georgia,serif}
+.note .nm{display:flex;gap:10px;align-items:center;font-size:.78rem;color:var(--mut);margin-top:6px}
+.note .nb{white-space:pre-wrap;word-break:break-word}
+#nd .btn{cursor:pointer}
 </style>
 </head>
 <body>
@@ -112,7 +117,25 @@ label{display:block;font:.8rem system-ui,sans-serif;color:var(--mut);margin:10px
   <label>Aanraden aan wie / waarom</label><input id="f_recfor" placeholder="bijv. voor wie van psychologie houdt">
   <label>Albums</label><div class="albs" id="f_albs"></div>
   <label>Notities</label><textarea id="f_notes" rows="3"></textarea>
+  <button type="button" class="btn" id="openNotes" style="width:100%;margin-top:12px;cursor:pointer">📝 Aantekeningen en samenvatting</button>
   <div class="acts"><button type="button" class="btn d" id="del">Verwijder</button><button type="button" class="btn" id="cancel">Annuleer</button><button type="button" class="btn p" id="save">Bewaar</button></div>
+</form></dialog>
+
+<dialog id="nd"><form method="dialog" onsubmit="return false">
+  <h2 id="nd_t" style="margin:0;font-size:1.15rem"></h2><div id="nd_a" class="a" style="font:.9rem system-ui,sans-serif;color:var(--mut)"></div>
+  <label>Mijn samenvatting van dit boek</label>
+  <textarea id="nd_sum" rows="5" maxlength="20000" placeholder="Hoe zie jij dit boek, in je eigen woorden?"></textarea>
+  <button type="button" class="btn p" id="nd_sumsave" style="width:100%;margin-top:6px">Samenvatting bewaren</button>
+  <div id="nd_sumeg" style="font:.85rem system-ui,sans-serif;color:var(--mut);margin-top:4px;min-height:1.2em"></div>
+  <label id="nd_formlabel">Nieuwe aantekening</label>
+  <textarea id="nd_body" rows="3" maxlength="5000" placeholder="Wat raakt je? Een inzicht, een idee, een les…"></textarea>
+  <input id="nd_quote" maxlength="2000" placeholder="Citaat uit het boek (optioneel)" style="margin-top:6px">
+  <input id="nd_page" inputmode="numeric" maxlength="5" placeholder="Pagina (optioneel)" style="margin-top:6px">
+  <div class="acts"><button type="button" class="btn" id="nd_cancelEdit" style="display:none">Annuleer wijziging</button><button type="button" class="btn p" id="nd_add">Aantekening toevoegen</button></div>
+  <div id="nd_msg" style="font:.85rem system-ui,sans-serif;color:var(--mut);margin-top:6px;min-height:1.2em"></div>
+  <label id="nd_listlabel">Mijn aantekeningen</label>
+  <div id="nd_list"></div>
+  <div class="acts"><button type="button" class="btn" id="nd_close">Sluiten</button></div>
 </form></dialog>
 
 <dialog id="ad"><form method="dialog" onsubmit="return false">
@@ -185,7 +208,7 @@ function render(){
     (b.title+' '+b.author+' '+(b.isbn||'')).toLowerCase().includes(q)).sort((a,b)=>a.title.localeCompare(b.title));
   $('list').innerHTML=L.length?L.map(b=>`<div class="book" data-b="${b.id}"><div class="cover" style="background:${col(b.title)}">${esc(b.title[0]||'?').toUpperCase()}${b.cover?`<img src="${esc(b.cover)}" alt="" onerror="this.remove()">`:''}</div>
    <div class="info"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div>
-   <div class="meta"><span class="tag">${esc(b.status)}</span><span class="tag">${esc(b.format)}</span>${b.shelf&&b.format==='fysiek'?`<span class="tag">📍 ${esc(b.shelf)}</span>`:''}${b.year?`<span class="tag">${esc(b.year)}</span>`:''}${b.pages?`<span class="tag">${esc(b.pages)} blz.</span>`:''}${b.rec?`<span class="tag">👥 ${'★'.repeat(b.rec)}</span>`:''}${b.rating?`<span class="tag">${'★'.repeat(b.rating)}</span>`:''}</div></div></div>`).join(''):
+   <div class="meta"><span class="tag">${esc(b.status)}</span><span class="tag">${esc(b.format)}</span>${b.shelf&&b.format==='fysiek'?`<span class="tag">📍 ${esc(b.shelf)}</span>`:''}${b.year?`<span class="tag">${esc(b.year)}</span>`:''}${b.pages?`<span class="tag">${esc(b.pages)} blz.</span>`:''}${b.rec?`<span class="tag">👥 ${'★'.repeat(b.rec)}</span>`:''}${b.rating?`<span class="tag">${'★'.repeat(b.rating)}</span>`:''}${noteCount(b.id)?`<span class="tag">📝 ${noteCount(b.id)}</span>`:''}${sums()[b.id]?`<span class="tag">📄 samenvatting</span>`:''}</div></div></div>`).join(''):
    '<div class="empty">Geen boeken gevonden.<br>Tik op “+ Boek” om er een toe te voegen.</div>';
 }
 
@@ -209,12 +232,12 @@ function openBook(b){
   $('f_title').value=v.title;$('f_author').value=v.author;$('f_isbn').value=v.isbn||'';$('f_pub').value=v.pub||'';$('f_year').value=v.year||'';$('f_pages').value=v.pages||'';curCover=v.cover||'';$('lmsg').textContent='';$('f_rec').value=v.rec||0;$('f_recfor').value=v.recFor||'';$('f_status').value=v.status;$('f_format').value=v.format;
   $('f_shelf').value=v.shelf;$('f_rating').value=v.rating;$('f_date').value=v.date;$('f_notes').value=v.notes;
   $('f_albs').innerHTML=S.albums.length?S.albums.map(a=>`<label><input type="checkbox" value="${a.id}" ${v.albums.includes(a.id)?'checked':''}>${esc(a.name)}</label>`).join(''):'<span class="a">Nog geen albums.</span>';
-  $('del').style.display=b?'':'none';$('bd').showModal();
+  $('del').style.display=b?'':'none';$('openNotes').style.display=b?'':'none';$('bd').showModal();
 }
 $('addBook').onclick=()=>openBook(null);
 $('list').onclick=e=>{const c=e.target.closest('.book');if(c)openBook(S.books.find(b=>b.id===c.dataset.b))};
 $('cancel').onclick=()=>$('bd').close();
-$('del').onclick=()=>{if(confirm('Dit boek verwijderen?')){S.books=S.books.filter(b=>b!==editB);save();$('bd').close();render()}};
+$('del').onclick=()=>{if(confirm('Dit boek verwijderen? Ook je aantekeningen en samenvatting bij dit boek verdwijnen.')){const bid=editB.id;S.notes=nlist().filter(n=>n.book_id!==bid);delete sums()[bid];S.books=S.books.filter(b=>b!==editB);save();$('bd').close();render()}};
 $('save').onclick=()=>{
   const title=$('f_title').value.trim();if(!title){$('f_title').focus();return}
   const isbn0=cleanIsbn($('f_isbn').value);
@@ -274,9 +297,79 @@ function renderRank(){
 }
 $('rk_by').onchange=$('rk_alb').onchange=renderRank;
 $('rk_list').onclick=e=>{const c=e.target.closest('.book');if(c){setView('lib');openBook(S.books.find(b=>b.id===c.dataset.b))}};
+/* ---- Aantekeningen en samenvatting ---- */
+let noteBook=null,editNoteId=null;
+function nlist(){return(S.notes=S.notes||[])}
+function sums(){return(S.summaries=S.summaries||{})}
+function noteCount(id){return nlist().filter(n=>n.book_id===id).length}
+async function syncFirst(){
+  if(!user)return true;
+  if(!cloudReady)return false;
+  clearTimeout(saveT);
+  while(pushing)await new Promise(r=>setTimeout(r,100));
+  return await pushCloud()}
+const ndMsg=t=>{$('nd_msg').textContent=t};
+function resetNoteForm(){editNoteId=null;$('nd_body').value='';$('nd_quote').value='';$('nd_page').value='';
+  $('nd_add').textContent='Aantekening toevoegen';$('nd_formlabel').textContent='Nieuwe aantekening';$('nd_cancelEdit').style.display='none'}
+function renderNotes(){
+  const L=nlist().filter(n=>n.book_id===noteBook.id);
+  $('nd_listlabel').textContent='Mijn aantekeningen ('+L.length+')';
+  $('nd_list').innerHTML=L.length?L.map(n=>`<div class="note" data-n="${esc(n.id)}"><div class="nb">${esc(n.body)}</div>${n.quote?`<div class="q">“${esc(n.quote)}”</div>`:''}
+    <div class="nm"><span>${n.page!=null&&n.page!==''?'blz. '+esc(n.page)+' · ':''}${esc(new Date(n.created_at).toLocaleDateString('nl-BE'))}</span><button type="button" class="link" data-act="edit">Bewerk</button><button type="button" class="link" data-act="del">Verwijder</button></div></div>`).join(''):
+    '<div class="a" style="font:.9rem system-ui,sans-serif;color:var(--mut);margin-bottom:8px">Nog geen aantekeningen. Schrijf er hierboven eentje terwijl je leest.</div>'}
+function openNotes(b){
+  noteBook=b;resetNoteForm();ndMsg('');$('nd_sumeg').textContent='';
+  $('nd_t').textContent=b.title;$('nd_a').textContent=b.author||'';
+  $('nd_sum').value=(sums()[b.id]||{}).body||'';
+  renderNotes();$('nd').showModal()}
+$('openNotes').onclick=()=>{if(editB)openNotes(editB)};
+$('nd_close').onclick=()=>{$('nd').close();render()};
+$('nd').addEventListener('close',()=>render());
+$('nd_cancelEdit').onclick=()=>{resetNoteForm();ndMsg('')};
+$('nd_sumsave').onclick=async()=>{
+  const body=$('nd_sum').value.trim(),m=$('nd_sumeg'),bid=noteBook.id;m.textContent='Opslaan…';
+  if(user){
+    if(!await syncFirst()){m.textContent='⚠️ Je boek kon niet eerst worden opgeslagen. Probeer het opnieuw.';return}
+    const r=body?await sb.from('book_summaries').upsert({book_id:bid,body},{onConflict:'book_id'}):await sb.from('book_summaries').delete().eq('book_id',bid);
+    if(r.error){m.textContent='⚠️ Opslaan mislukt: '+(r.error.message||r.error.code);return}}
+  if(body)sums()[bid]={body,updated_at:new Date().toISOString()};else delete sums()[bid];
+  if(!user)save();
+  m.textContent=body?'✓ Samenvatting bewaard':'Samenvatting verwijderd'};
+$('nd_add').onclick=async()=>{
+  const body=$('nd_body').value.trim(),quote=$('nd_quote').value.trim()||null,pg=$('nd_page').value.trim(),bid=noteBook.id;
+  const page=pg===''?null:intIn(pg,0,20000);
+  if(!body){ndMsg('Schrijf eerst een aantekening.');return}
+  if(pg!==''&&page===null){ndMsg('De pagina moet een getal zijn.');return}
+  ndMsg('Opslaan…');
+  let row;
+  if(user){
+    if(!await syncFirst()){ndMsg('⚠️ Je boek kon niet eerst worden opgeslagen. Probeer het opnieuw.');return}
+    const r=editNoteId?await sb.from('book_notes').update({body,quote,page}).eq('id',editNoteId).select().single()
+                      :await sb.from('book_notes').insert({book_id:bid,body,quote,page}).select().single();
+    if(r.error){ndMsg('⚠️ Opslaan mislukt: '+(r.error.message||r.error.code));return}
+    row={id:r.data.id,book_id:bid,body:r.data.body,quote:r.data.quote,page:r.data.page,created_at:r.data.created_at};
+  }else row={id:editNoteId||uid(),book_id:bid,body,quote,page,created_at:new Date().toISOString()};
+  const L=nlist(),i=L.findIndex(n=>n.id===row.id);
+  if(i>=0)L[i]={...L[i],...row,created_at:L[i].created_at};else L.unshift(row);
+  if(!user)save();
+  resetNoteForm();renderNotes();ndMsg('✓ Bewaard')};
+$('nd_list').onclick=async e=>{
+  const bt=e.target.closest('button[data-act]');if(!bt)return;
+  const id=bt.closest('.note').dataset.n,n=nlist().find(x=>x.id===id);if(!n)return;
+  if(bt.dataset.act==='edit'){
+    editNoteId=id;$('nd_body').value=n.body;$('nd_quote').value=n.quote||'';$('nd_page').value=n.page==null?'':n.page;
+    $('nd_add').textContent='Wijziging bewaren';$('nd_formlabel').textContent='Aantekening bewerken';$('nd_cancelEdit').style.display='';
+    $('nd_body').focus();return}
+  if(!confirm('Deze aantekening verwijderen?'))return;
+  if(user){const r=await sb.from('book_notes').delete().eq('id',id);
+    if(r.error){ndMsg('⚠️ Verwijderen mislukt: '+(r.error.message||r.error.code));return}}
+  S.notes=nlist().filter(x=>x.id!==id);if(!user)save();
+  if(editNoteId===id)resetNoteForm();
+  renderNotes();ndMsg('Aantekening verwijderd')};
+
 /* ---- Back-up ---- */
 $('exp').onclick=()=>{
-  const blob=new Blob([JSON.stringify({app:'boekenkast',version:1,albums:S.albums,books:S.books},null,1)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({app:'boekenkast',version:1,albums:S.albums,books:S.books,notes:S.notes||[],summaries:S.summaries||{}},null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='boekenkast-backup-'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
@@ -359,12 +452,14 @@ async function pushCloud(){
   pushing=false;return ok}
 async function loadCloud(){
   snap=null;
-  const [b,a,l,p]=await Promise.all([
+  const [b,a,l,p,nt,sm]=await Promise.all([
     sb.from('books').select('*').order('created_at'),
     sb.from('albums').select('*').order('created_at'),
     sb.from('album_books').select('album_id,book_id'),
-    sb.from('profiles').select('examples_added').eq('id',user.id).maybeSingle()]);
-  const err=b.error||a.error||l.error||p.error;
+    sb.from('profiles').select('examples_added').eq('id',user.id).maybeSingle(),
+    sb.from('book_notes').select('*').order('created_at',{ascending:false}),
+    sb.from('book_summaries').select('*')]);
+  const err=b.error||a.error||l.error||p.error||nt.error||sm.error;
   if(err){console.error(err);setSync('⚠️ Laden mislukt: '+(err.message||err.code||'onbekende fout'));return false}
   const byBook={};l.data.forEach(x=>(byBook[x.book_id]=byBook[x.book_id]||[]).push(x.album_id));
   S={albums:a.data.map(x=>({id:x.id,name:x.name})),books:b.data.map(r=>fromRow(r,byBook[r.id]))};
@@ -373,6 +468,8 @@ async function loadCloud(){
     seedCloudState();
     if(await pushCloud())await sb.from('profiles').update({examples_added:true}).eq('id',user.id);
   }
+  S.notes=nt.data.map(n=>({id:n.id,book_id:n.book_id,body:n.body,quote:n.quote,page:n.page,created_at:n.created_at}));
+  S.summaries={};sm.data.forEach(x=>{S.summaries[x.book_id]={body:x.body,updated_at:x.updated_at}});
   setSync('✓ Gesynchroniseerd');return true}
 function handleSession(session){
   if(session&&session.user){

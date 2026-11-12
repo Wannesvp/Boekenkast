@@ -5,76 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mijn Boekenkast</title>
 <style>
-:root{--bg:#faf6ef;--card:#fff;--ink:#2b2118;--mut:#7a6c5d;--line:#e6dccb;--acc:#8a4b2a;--acc-ink:#fff;--chip:#efe5d3;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1713;--card:#272019;--ink:#f1e8da;--mut:#a89a88;--line:#3a3025;--acc:#d98e5f;--acc-ink:#1c1713;--chip:#352b21;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#1c1713;--card:#272019;--ink:#f1e8da;--mut:#a89a88;--line:#3a3025;--acc:#d98e5f;--acc-ink:#1c1713;--chip:#352b21;color-scheme:dark}
+:root{--bg:#eceee6;--card:#fbfaf5;--ink:#1b2230;--mut:#566072;--line:#c9cdc0;--acc:#2c3e8f;--acc-ink:#fff;--chip:#dfe3d6;--star:#a8741a;--danger:#b3261e;
+--serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;--ui:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131c;--card:#171c28;--ink:#eceae2;--mut:#98a0b0;--line:#2b3345;--acc:#93a5f2;--acc-ink:#0f131c;--chip:#212839;--star:#e0b252;--danger:#f2928b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f131c;--card:#171c28;--ink:#eceae2;--mut:#98a0b0;--line:#2b3345;--acc:#93a5f2;--acc-ink:#0f131c;--chip:#212839;--star:#e0b252;--danger:#f2928b;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,'Times New Roman',serif;max-width:720px;margin-inline:auto;padding:16px 16px 90px}
-h1{font-size:1.5rem;margin:4px 0 2px}
-.sub{color:var(--mut);font:.85rem system-ui,sans-serif;margin-bottom:12px}
-button,input,select,textarea{font:inherit;font-family:system-ui,sans-serif;color:var(--ink)}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
-.chip{flex:none;border:1px solid var(--line);background:var(--chip);border-radius:20px;padding:6px 14px;cursor:pointer;font-size:.9rem}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--ui);max-width:640px;margin-inline:auto;padding:20px 18px 96px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+h1{font:600 2rem/1.1 var(--serif);letter-spacing:-.01em;margin:6px 0 4px}
+h2{font-family:var(--serif);font-weight:600}
+.sub{color:var(--mut);font-size:.9rem;margin-bottom:18px}
+button,input,select,textarea{font:inherit;font-family:var(--ui);color:var(--ink)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
+.chip{flex:none;border:1px solid var(--line);background:transparent;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.88rem}
 .chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
-.chip.add{background:none;border-style:dashed}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip.add{border-style:dashed;color:var(--mut)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .bar input{flex:1 1 100%}
 .bar select{flex:1}
-input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
-.albbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;font:.9rem system-ui,sans-serif;color:var(--mut)}
+input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 11px;width:100%}
+.albbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:.9rem;color:var(--mut)}
 .link{background:none;border:none;color:var(--acc);cursor:pointer;padding:2px 4px;text-decoration:underline}
-.book{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
-.cover{flex:none;width:52px;height:76px;border-radius:4px 8px 8px 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.4rem;box-shadow:inset 4px 0 0 rgba(0,0,0,.2)}
-.info{min-width:0;flex:1}
-.cover{position:relative;overflow:hidden}.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.t{font-weight:bold}
+.book{display:block;margin:0 0 16px;cursor:pointer}
+.spine{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:68px;padding:11px 18px 11px 26px;background:var(--sp);color:var(--spt);border-radius:3px 8px 8px 3px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),inset 0 3px 0 rgba(255,255,255,.1)}
+.spine::before{content:"";position:absolute;left:11px;top:9px;bottom:9px;width:2px;background:currentColor;opacity:.3}
+.sp-t{font:600 1.12rem/1.2 var(--serif);letter-spacing:.01em;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sp-a{flex:none;max-width:36%;text-align:right;font-size:.78rem;line-height:1.25;letter-spacing:.04em;opacity:.88}
+.book:hover .spine{filter:brightness(1.07)}
+.meta{display:flex;flex-wrap:wrap;gap:2px 16px;margin:8px 4px 0;font-size:.8rem;color:var(--mut)}
+.tag{padding:0;background:none}
+.tag.s::before{content:"";display:inline-block;width:.62em;height:.62em;border-radius:50%;border:1.5px solid var(--ink);margin-right:.45em;vertical-align:-1px}
+.tag.s-gelezen::before{background:var(--ink)}
+.tag.s-bezig::before{background:linear-gradient(90deg,var(--ink) 50%,transparent 50%)}
 .a{color:var(--mut);font-size:.9rem}
-.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font:.75rem system-ui,sans-serif}
-.tag{background:var(--chip);border-radius:10px;padding:2px 8px}
-.empty{text-align:center;color:var(--mut);padding:40px 10px}
-.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--acc);color:var(--acc-ink);border:none;border-radius:28px;padding:14px 20px;font-weight:bold;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer}
-dialog{border:none;border-radius:14px;padding:18px;width:min(92vw,460px);background:var(--bg);color:var(--ink);max-height:90vh}
-dialog::backdrop{background:rgba(0,0,0,.5)}
-label{display:block;font:.8rem system-ui,sans-serif;color:var(--mut);margin:10px 0 3px}
+.empty{text-align:center;color:var(--mut);padding:44px 12px}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--acc);color:var(--acc-ink);border:none;border-radius:10px;padding:14px 20px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,.28);cursor:pointer}
+dialog{border:none;border-radius:10px;padding:20px;width:min(92vw,460px);background:var(--card);color:var(--ink);max-height:90vh}
+dialog::backdrop{background:rgba(10,14,22,.55)}
+dialog h2{font-size:1.3rem;line-height:1.2}
+label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
 .row{display:flex;gap:8px}.row>*{flex:1}
 .albs{display:flex;flex-wrap:wrap;gap:6px}
-.albs label{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);background:var(--chip);border-radius:16px;padding:5px 10px}
+.albs label{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);background:var(--chip);border-radius:6px;padding:6px 10px}
 .albs input{width:auto}
-.acts{display:flex;gap:8px;margin-top:16px}
-.btn{flex:1;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:10px;cursor:pointer}
-.btn.p{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:bold}
-.btn.d{color:#c0392b}
+.acts{display:flex;gap:8px;margin-top:18px}
+.btn{flex:1;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:10px;cursor:pointer}
+.btn.p{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+.btn.d{color:var(--danger)}
 .isbnrow{display:flex;gap:8px}.isbnrow input{flex:1}.isbnrow .btn{flex:none;padding:9px 12px}
-.tabs{display:flex;gap:6px;margin-bottom:12px;border-bottom:1px solid var(--line)}
-.tab{background:none;border:none;padding:8px 14px;cursor:pointer;font:600 .95rem system-ui,sans-serif;color:var(--mut);border-bottom:3px solid transparent}
-.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
-.rk{align-items:center}.pos{flex:none;width:30px;text-align:center;font:bold 1.2rem Georgia,serif;color:var(--acc)}
-.rr{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font:.8rem system-ui,sans-serif;color:var(--mut)}.st{color:var(--acc);letter-spacing:1px}
+.tabs{display:flex;gap:22px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:none;padding:8px 0;cursor:pointer;font:600 1rem var(--ui);color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ink);border-bottom-color:var(--acc)}
+.book.rk{display:flex;align-items:flex-start;gap:12px}
+.rkb{flex:1;min-width:0}
+.pos{flex:none;width:30px;text-align:right;font:600 1.5rem/1 var(--serif);color:var(--acc);padding-top:20px}
+.rr{display:flex;gap:18px;flex-wrap:wrap;margin:8px 4px 0;font-size:.82rem;color:var(--mut)}.rr .a{margin:0}
+.st{color:var(--star);letter-spacing:1px;font-weight:400}
 .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .head .btn{flex:none;padding:6px 12px;font-size:.85rem;cursor:pointer}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;font-family:system-ui,sans-serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:12px}
 .card .btn{width:100%;cursor:pointer}.card p{margin:4px 0 10px}.card .a{margin-top:4px}
-.foot{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:.85rem system-ui,sans-serif;color:var(--mut)}
+.foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.85rem;color:var(--mut)}
 .foot .btn{flex:none;padding:8px 12px;font-size:.85rem;color:var(--ink);margin:0;text-align:center;cursor:pointer}
 .foot>div{flex:1 1 100%}
-.note{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-family:system-ui,sans-serif}
-.note .q{border-left:3px solid var(--acc);padding-left:8px;margin:6px 0;color:var(--mut);font-style:italic;font-family:Georgia,serif}
-.note .nm{display:flex;gap:10px;align-items:center;font-size:.78rem;color:var(--mut);margin-top:6px}
+.note{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-bottom:8px}
+.note .q{border-left:3px solid var(--acc);padding-left:10px;margin:8px 0;color:var(--mut);font-style:italic;font-family:var(--serif)}
+.note .nm{display:flex;gap:12px;align-items:center;font-size:.78rem;color:var(--mut);margin-top:8px}
 .note .nb{white-space:pre-wrap;word-break:break-word}
+.bcov{float:right;width:72px;height:auto;max-height:108px;margin:0 0 8px 12px;border-radius:2px 5px 5px 2px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 #nd .btn{cursor:pointer}
 #nd textarea,#nd input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box}
 #nd textarea{min-height:96px;height:auto;resize:vertical}
 #nd #nd_body{min-height:110px}
 #nd form,#nd label{min-width:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="head"><h1>📚 Mijn Boekenkast</h1><button class="btn" id="accBtn" style="display:none">👤 Inloggen</button></div>
+<div class="head"><h1>Mijn Boekenkast</h1><button class="btn" id="accBtn" style="display:none">Inloggen</button></div>
 <div class="sub" id="stats"></div>
-<div id="syncbar" style="display:none;background:var(--chip);color:#c0392b;border-radius:8px;padding:8px 12px;margin-bottom:10px;font:.85rem system-ui,sans-serif"></div>
-<div class="tabs"><button class="tab on" data-v="lib">📚 Bibliotheek</button><button class="tab" data-v="rank">🏆 Ranglijst</button></div>
+<div id="syncbar" style="display:none;background:var(--chip);color:var(--danger);border-radius:8px;padding:8px 12px;margin-bottom:10px;font:.85rem system-ui,sans-serif"></div>
+<div class="tabs"><button class="tab on" data-v="lib">Bibliotheek</button><button class="tab" data-v="rank">Ranglijst</button></div>
 <div id="viewLib">
 <div class="chips" id="chips"></div>
 <div class="albbar" id="albbar"></div>
@@ -95,18 +108,19 @@ label{display:block;font:.8rem system-ui,sans-serif;color:var(--mut);margin:10px
   <div class="card"><b>Ingelogd als</b><div id="acc_mail" class="a"></div><div id="acc_sync" class="a"></div></div>
   <div class="card"><b>Wachtwoord</b><p class="a">Kies een nieuw wachtwoord voor je account.</p><button class="btn" id="acc_pw">Wachtwoord wijzigen</button></div>
   <div class="card"><b>E-mailadres wijzigen</b><p class="a">Je krijgt een bevestigingsmail om het nieuwe adres te activeren.</p><input id="acc_newmail" type="email" placeholder="nieuw@adres.nl"><button class="btn" id="acc_mailbtn" style="margin-top:8px">Wijzig e-mailadres</button><div id="acc_mmsg" class="a"></div></div>
-  <div class="card"><b>Mijn gegevens</b><p class="a">Download alles wat je hebt opgeslagen, of begin opnieuw met een lege bibliotheek.</p><div class="row"><button class="btn" id="acc_export">⬇️ Exporteer</button><button class="btn d" id="acc_wipe">Leeg bibliotheek</button></div><div id="acc_gmsg" class="a"></div></div>
+  <div class="card"><b>Mijn gegevens</b><p class="a">Download alles wat je hebt opgeslagen, of begin opnieuw met een lege bibliotheek.</p><div class="row"><button class="btn" id="acc_export">Exporteer</button><button class="btn d" id="acc_wipe">Leeg bibliotheek</button></div><div id="acc_gmsg" class="a"></div></div>
   <div class="card"><button class="btn" id="acc_logout">Uitloggen</button></div>
-  <div class="card"><b style="color:#c0392b">Account verwijderen</b><p class="a">Verwijdert je account en al je gegevens definitief.</p><input id="acc_delconf" placeholder="Typ VERWIJDER om te bevestigen"><button class="btn d" id="acc_del" style="margin-top:8px">Verwijder account</button><div id="acc_dmsg" class="a"></div></div>
+  <div class="card"><b style="color:var(--danger)">Account verwijderen</b><p class="a">Verwijdert je account en al je gegevens definitief.</p><input id="acc_delconf" placeholder="Typ VERWIJDER om te bevestigen"><button class="btn d" id="acc_del" style="margin-top:8px">Verwijder account</button><div id="acc_dmsg" class="a"></div></div>
  </div>
 </div>
 <div class="foot"><div>Je boeken staan alleen in deze browser op dit apparaat, tenzij je inlogt. Maak regelmatig een back-up.</div>
-<button class="btn" id="exp">⬇️ Exporteer</button><label class="btn" for="imp">⬆️ Importeer</label>
+<button class="btn" id="exp">Exporteer</button><label class="btn" for="imp">Importeer</label>
 <input type="file" id="imp" accept="application/json,.json" style="position:absolute;opacity:0;width:1px;height:1px"><div id="impmsg"></div></div>
 <button class="fab" id="addBook">+ Boek</button>
 
 <dialog id="bd"><form method="dialog" id="bf" onsubmit="return false">
   <h2 id="bt" style="margin:0 0 4px;font-size:1.2rem">Boek</h2>
+  <div id="bd_cover"></div>
   <label>Titel</label><input id="f_title" required>
   <label>Auteur</label><input id="f_author">
   <label>ISBN</label><div class="isbnrow"><input id="f_isbn" inputmode="numeric" placeholder="978…"><button type="button" class="btn" id="f_lookup">Opzoeken</button></div>
@@ -121,7 +135,7 @@ label{display:block;font:.8rem system-ui,sans-serif;color:var(--mut);margin:10px
   <label>Aanraden aan wie / waarom</label><input id="f_recfor" placeholder="bijv. voor wie van psychologie houdt">
   <label>Albums</label><div class="albs" id="f_albs"></div>
   <label>Notities</label><textarea id="f_notes" rows="3"></textarea>
-  <button type="button" class="btn" id="openNotes" style="width:100%;margin-top:12px;cursor:pointer">📝 Aantekeningen en samenvatting</button>
+  <button type="button" class="btn" id="openNotes" style="width:100%;margin-top:12px;cursor:pointer">Aantekeningen en samenvatting</button>
   <div class="acts"><button type="button" class="btn d" id="del">Verwijder</button><button type="button" class="btn" id="cancel">Annuleer</button><button type="button" class="btn p" id="save">Bewaar</button></div>
 </form></dialog>
 
@@ -196,11 +210,14 @@ seedState();save();
 let cur='all',editB=null,editA=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const col=t=>{let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))%360;return `hsl(${h} 35% 38%)`};
+const SPINES=[['#7a2e2e','#fff'],['#2c3e8f','#fff'],['#2f5d4a','#fff'],['#b8862b','#1b1405'],['#2f6670','#fff'],['#5e3a63','#fff'],['#27303f','#fff'],['#e4dccb','#1b2230']];
+const col=t=>{let h=0;for(const c of String(t))h=(h*31+c.charCodeAt(0))>>>0;return SPINES[h%SPINES.length]};
+const shortTitle=t=>String(t).split(/:\s/)[0];
+const spineHtml=b=>{const c=col(b.title);return `<div class="spine" style="--sp:${c[0]};--spt:${c[1]}"><span class="sp-t">${esc(shortTitle(b.title))}</span><span class="sp-a">${esc(b.author)}</span></div>`};
 
 function render(){
   const n=s=>S.books.filter(b=>b.status===s).length;
-  $('stats').textContent=`${S.books.length} boeken · ${n('gelezen')} gelezen · ${n('bezig')} bezig · ${n('nog te lezen')} nog te lezen`;
+  $('stats').textContent=`${S.books.length} ${S.books.length===1?'boek':'boeken'}: ${n('gelezen')} gelezen, ${n('bezig')} bezig, ${n('nog te lezen')} nog te lezen`;
   const cnt=id=>S.books.filter(b=>b.albums.includes(id)).length;
   $('chips').innerHTML=`<button class="chip ${cur==='all'?'on':''}" data-a="all">Alle (${S.books.length})</button>`+
     S.albums.map(a=>`<button class="chip ${cur===a.id?'on':''}" data-a="${a.id}">${esc(a.name)} (${cnt(a.id)})</button>`).join('')+
@@ -210,9 +227,8 @@ function render(){
   const q=$('q').value.toLowerCase(),fs=$('fs').value,ff=$('ff').value;
   const L=S.books.filter(b=>(cur==='all'||b.albums.includes(cur))&&(!fs||b.status===fs)&&(!ff||b.format===ff)&&
     (b.title+' '+b.author+' '+(b.isbn||'')).toLowerCase().includes(q)).sort((a,b)=>a.title.localeCompare(b.title));
-  $('list').innerHTML=L.length?L.map(b=>`<div class="book" data-b="${b.id}"><div class="cover" style="background:${col(b.title)}">${esc(b.title[0]||'?').toUpperCase()}${b.cover?`<img src="${esc(b.cover)}" alt="" onerror="this.remove()">`:''}</div>
-   <div class="info"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div>
-   <div class="meta"><span class="tag">${esc(b.status)}</span><span class="tag">${esc(b.format)}</span>${b.shelf&&b.format==='fysiek'?`<span class="tag">📍 ${esc(b.shelf)}</span>`:''}${b.year?`<span class="tag">${esc(b.year)}</span>`:''}${b.pages?`<span class="tag">${esc(b.pages)} blz.</span>`:''}${b.rec?`<span class="tag">👥 ${'★'.repeat(b.rec)}</span>`:''}${b.rating?`<span class="tag">${'★'.repeat(b.rating)}</span>`:''}${noteCount(b.id)?`<span class="tag">📝 ${noteCount(b.id)}</span>`:''}${sums()[b.id]?`<span class="tag">📄 samenvatting</span>`:''}</div></div></div>`).join(''):
+  $('list').innerHTML=L.length?L.map(b=>`<div class="book" data-b="${b.id}" tabindex="0" role="button">${spineHtml(b)}
+   <div class="meta"><span class="tag s s-${esc(b.status).replace(/ /g,'-')}">${esc(b.status)}</span><span class="tag">${esc(b.format)}</span>${b.shelf&&b.format==='fysiek'?`<span class="tag">kast: ${esc(b.shelf)}</span>`:''}${b.year?`<span class="tag">${esc(b.year)}</span>`:''}${b.pages?`<span class="tag">${esc(b.pages)} blz.</span>`:''}${b.rating?`<span class="tag">mijn <b class="st">${'★'.repeat(b.rating)}</b></span>`:''}${b.rec?`<span class="tag">aanraden <b class="st">${'★'.repeat(b.rec)}</b></span>`:''}${noteCount(b.id)?`<span class="tag">${noteCount(b.id)} ${noteCount(b.id)>1?'aantekeningen':'aantekening'}</span>`:''}${sums()[b.id]?`<span class="tag">samenvatting</span>`:''}</div></div>`).join(''):
    '<div class="empty">Geen boeken gevonden.<br>Tik op “+ Boek” om er een toe te voegen.</div>';
 }
 
@@ -233,7 +249,7 @@ $('a_save').onclick=()=>{const n=$('a_name').value.trim();if(!n)return;
 function openBook(b){
   editB=b;$('bt').textContent=b?'Boek bewerken':'Nieuw boek';
   const v=b||{title:'',author:'',isbn:'',status:'nog te lezen',format:'fysiek',shelf:'',rating:0,date:'',notes:'',albums:cur!=='all'?[cur]:[]};
-  $('f_title').value=v.title;$('f_author').value=v.author;$('f_isbn').value=v.isbn||'';$('f_pub').value=v.pub||'';$('f_year').value=v.year||'';$('f_pages').value=v.pages||'';curCover=v.cover||'';$('lmsg').textContent='';$('f_rec').value=v.rec||0;$('f_recfor').value=v.recFor||'';$('f_status').value=v.status;$('f_format').value=v.format;
+  $('f_title').value=v.title;$('f_author').value=v.author;$('f_isbn').value=v.isbn||'';$('f_pub').value=v.pub||'';$('f_year').value=v.year||'';$('f_pages').value=v.pages||'';curCover=v.cover||'';showCover();$('lmsg').textContent='';$('f_rec').value=v.rec||0;$('f_recfor').value=v.recFor||'';$('f_status').value=v.status;$('f_format').value=v.format;
   $('f_shelf').value=v.shelf;$('f_rating').value=v.rating;$('f_date').value=v.date;$('f_notes').value=v.notes;
   $('f_albs').innerHTML=S.albums.length?S.albums.map(a=>`<label><input type="checkbox" value="${a.id}" ${v.albums.includes(a.id)?'checked':''}>${esc(a.name)}</label>`).join(''):'<span class="a">Nog geen albums.</span>';
   $('del').style.display=b?'':'none';$('openNotes').style.display=b?'':'none';$('bd').showModal();
@@ -255,6 +271,7 @@ $('save').onclick=()=>{
 /* ---- ISBN opzoeken ---- */
 const cleanIsbn=s=>String(s||'').replace(/[^0-9Xx]/g,'').toUpperCase();
 let curCover='';
+function showCover(){const c=curCover;$('bd_cover').innerHTML=(c&&/^https:\/\//i.test(c))?`<img class="bcov" src="${esc(c)}" alt="" onerror="this.remove()">`:''}
 const getJson=async u=>{const r=await fetch(u);if(!r.ok)throw 0;return r.json()};
 const yr=d=>(String(d||'').match(/\d{4}/)||[''])[0];
 async function lookup(i){
@@ -277,7 +294,7 @@ $('f_lookup').onclick=async()=>{
   if(!r){m.textContent='Niets gevonden of geen verbinding. Vul de gegevens zelf in.';return}
   const set=(id,v)=>{if(v&&!$(id).value.trim())$(id).value=v};
   set('f_title',r.title);set('f_author',r.author);set('f_pub',r.pub);set('f_year',r.year);set('f_pages',r.pages);
-  if(r.cover)curCover=r.cover;
+  if(r.cover){curCover=r.cover;showCover()}
   m.textContent='Gegevens ingevuld. Controleer ze even.'};
 $('f_isbn').oninput=()=>{$('lmsg').textContent='';if(cleanIsbn($('f_isbn').value).length===13)$('f_lookup').click()};
 /* ---- Ranglijst ---- */
@@ -295,8 +312,8 @@ function renderRank(){
   const inA=S.books.filter(b=>al==='all'||b.albums.includes(al));
   const rated=inA.filter(b=>b[by]>0).sort((a,b)=>b[by]-a[by]||(b[other]||0)-(a[other]||0)||a.title.localeCompare(b.title));
   const n=inA.length-rated.length,lbl=by==='rating'?'rating':'aanbeveling';
-  $('rk_list').innerHTML=(rated.length?rated.map((b,i)=>`<div class="book rk" data-b="${b.id}"><div class="pos">${i+1}</div><div class="info"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div>
-    <div class="rr"><span>Mijn rating <b class="st">${stars(b.rating||0)}</b></span><span>Aanbeveling <b class="st">${stars(b.rec||0)}</b></span></div>${b.recFor?`<div class="a">👥 ${esc(b.recFor)}</div>`:''}</div></div>`).join(''):`<div class="empty">Nog geen boeken met een ${lbl} in deze selectie.<br>Vul die in bij een boek.</div>`)+
+  $('rk_list').innerHTML=(rated.length?rated.map((b,i)=>`<div class="book rk" data-b="${b.id}" tabindex="0" role="button"><div class="pos">${i+1}</div><div class="rkb">${spineHtml(b)}
+    <div class="rr"><span>mijn <b class="st">${stars(b.rating||0)}</b></span><span>aanraden <b class="st">${stars(b.rec||0)}</b></span></div>${b.recFor?`<div class="rr"><span class="a">${esc(b.recFor)}</span></div>`:''}</div></div>`).join(''):`<div class="empty">Nog geen boeken met een ${lbl} in deze selectie.<br>Vul die in bij een boek.</div>`)+
     (n&&rated.length?`<div class="sub" style="text-align:center">${n} ${n>1?'boeken':'boek'} zonder ${lbl} niet getoond</div>`:'');
 }
 $('rk_by').onchange=$('rk_alb').onchange=renderRank;
@@ -401,7 +418,7 @@ const SUPA_KEY='sb_publishable_uXPDhLRxiqdRJD8989a-gQ_pacf77cb';   /* vul hier j
 const fresh=()=>({albums:[{id:'a1',name:'Fysieke boekenkast'},{id:'a2',name:'Digitaal'},{id:'a3',name:'Wishlist'}],books:[]});
 function loadLocal(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):fresh()}catch(e){S=fresh()}seedState()}
 const setSync=m=>{const e=$('acc_sync');if(e)e.textContent=m;const b=$('syncbar');b.textContent=m;b.style.display=m.indexOf('⚠️')===0?'':'none'};
-const updAccBtn=()=>{$('accBtn').textContent=user?'👤 Account':'👤 Inloggen'};
+const updAccBtn=()=>{$('accBtn').textContent=user?'Account':'Inloggen'};
 /* ---- Cloud: tabellen books, albums, album_books ---- */
 const clip=(v,n)=>{v=String(v==null?'':v).trim();return v?v.slice(0,n):null};
 const intIn=(v,lo,hi)=>{const n=parseInt(v,10);return Number.isFinite(n)&&n>=lo&&n<=hi?n:null};
@@ -569,6 +586,8 @@ $('acc_del').onclick=async()=>{
       handleSession(session)});
   }catch(e){}
 })();
+$('list').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('book')){e.preventDefault();e.target.click()}});
+$('rk_list').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('book')){e.preventDefault();e.target.click()}});
 const _render=render;render=function(){_render();if(view==='rank')renderRank()};
 render();
 </script>

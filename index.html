@@ -161,6 +161,9 @@ function seedState(){try{S.seeded=S.seeded||[];
    'seed-3':{status:'gelezen',date:'2025-07-02',rating:4,rec:5,recFor:'Voor iedereen die routines wil opbouwen (Spaanstalig)'},
    'seed-4':{status:'gelezen',date:'2026-01-20',rating:3,rec:4,recFor:'Voor wie een duwtje nodig heeft om te beginnen'}};
   S.books.forEach(b=>{const p=P[b.id];if(p&&!b.rating&&!b.rec)Object.assign(b,p)})}
+ if(!S.patched.includes('trim-seed-v2')){S.patched.push('trim-seed-v2');
+  const OLD=['seed-5','seed-6','seed-7','seed-8','seed-9','seed-10','seed-12','seed-13','seed-14'];
+  S.books=S.books.filter(b=>!(OLD.includes(b.id)&&!(b.shelf&&String(b.shelf).trim())))}
 }catch(e){}}
 seedState();save();
 let cur='all',editB=null,editA=null;

@@ -47,6 +47,14 @@ input,select,textarea{background:var(--card);border:1px solid var(--bd);border-r
 .guest .tabs,.guest #viewLib,.guest #viewRank,.guest #viewInbox,.guest .fab,.guest .foot,.guest #stats{display:none!important}
 #viewGuest{display:none}.guest #viewGuest{display:block}
 body:not(.ready) .tabs,body:not(.ready) #viewLib,body:not(.ready) .fab,body:not(.ready) .foot{visibility:hidden}
+.tools{display:flex;gap:8px;margin-bottom:10px}
+.tl{position:relative;flex:none;display:flex;align-items:center;justify-content:center;gap:8px;min-width:48px;min-height:44px;padding:0 12px;border:1px solid var(--bd);background:transparent;border-radius:8px;color:var(--ink);cursor:pointer;font-size:.9rem}
+.tl.on{flex:1;background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600;justify-content:flex-start}
+.tl .tlb{display:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl.on .tlb{display:inline}
+.tl.act::after{content:"";position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--star);box-shadow:0 0 0 2px var(--bg)}
+.tp{margin-bottom:14px}.tp[hidden]{display:none}
+.tp .chips{padding-bottom:6px}
 .ib{margin:0 0 18px}
 .ib h3{font:600 1.15rem var(--serif);margin:0}
 .ib .bk{margin-top:8px}
@@ -111,13 +119,16 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
 <div id="syncbar" style="display:none;background:var(--chip);color:var(--danger);border-radius:8px;padding:8px 12px;margin-bottom:10px;font:.85rem system-ui,sans-serif"></div>
 <div class="tabs"><button class="tab on" data-v="lib">Bibliotheek</button><button class="tab" data-v="rank">Ranglijst</button><button class="tab" data-v="inbox" id="tabInbox">Aanbevolen</button></div>
 <div id="viewLib">
-<div class="chips" id="chips"></div>
-<div class="albbar" id="albbar"></div>
-<div class="bar">
-  <input id="q" type="search" aria-label="Zoek op titel of auteur" placeholder="Zoek op titel of auteur…">
-  <select id="fs" aria-label="Filter op status"><option value="">Alle statussen</option><option value="gelezen">Gelezen</option><option value="bezig">Bezig</option><option value="nog te lezen">Nog te lezen</option></select>
-  <select id="ff" aria-label="Filter op formaat"><option value="">Alle formaten</option><option value="fysiek">Fysiek</option><option value="e-book">E-book</option><option value="audio">Audio</option></select>
+<div class="tools" id="tools" role="toolbar" aria-label="Filters">
+<button class="tl on" data-t="alb" aria-expanded="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg><span class="tlb" id="tl_alb">Albums</span></button>
+<button class="tl" data-t="q" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="tlb" id="tl_q">Zoeken</span></button>
+<button class="tl" data-t="fs" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span class="tlb" id="tl_fs">Status</span></button>
+<button class="tl" data-t="ff" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg><span class="tlb" id="tl_ff">Formaat</span></button>
 </div>
+<div class="tp" id="tp_alb"><div class="chips" id="chips"></div><div class="albbar" id="albbar"></div></div>
+<div class="tp" id="tp_q" hidden><input id="q" type="search" aria-label="Zoek op titel of auteur" placeholder="Zoek op titel of auteur…"></div>
+<div class="tp" id="tp_fs" hidden><select id="fs" aria-label="Filter op status"><option value="">Alle statussen</option><option value="gelezen">Gelezen</option><option value="bezig">Bezig</option><option value="nog te lezen">Nog te lezen</option></select></div>
+<div class="tp" id="tp_ff" hidden><select id="ff" aria-label="Filter op formaat"><option value="">Alle formaten</option><option value="fysiek">Fysiek</option><option value="e-book">E-book</option><option value="audio">Audio</option></select></div>
 <div id="list"></div>
 </div>
 <div id="viewRank" style="display:none">
@@ -277,7 +288,7 @@ $('albbar').onclick=e=>{const t=e.target.id;
   if(t==='renAlb')openAlb(S.albums.find(a=>a.id===cur));
   if(t==='delAlb'&&confirm('Album verwijderen? De boeken zelf blijven bewaard.')){
     S.books.forEach(b=>b.albums=b.albums.filter(x=>x!==cur));S.albums=S.albums.filter(a=>a.id!==cur);cur='all';save();render()}};
-['q','fs','ff'].forEach(i=>$(i).oninput=render);
+['q','fs','ff'].forEach(i=>$(i).oninput=()=>render());
 
 function openAlb(a){editA=a;$('at').textContent=a?'Album hernoemen':'Nieuw album';$('a_name').value=a?a.name:'';$('ad').showModal();$('a_name').focus()}
 $('a_cancel').onclick=()=>$('ad').close();
@@ -712,7 +723,19 @@ $('ib_list').onclick=e=>{const d=e.target.dataset||{};
   document.querySelectorAll('dialog').forEach(d=>{const h=d.querySelector('h2');if(h){if(!h.id)h.id='h_'+d.id;d.setAttribute('aria-labelledby',h.id)}});
   $('syncbar').setAttribute('role','alert')})();
 
-const _render=render;render=function(){_render();if(view==='rank')renderRank()};
+/* ---- Filterbalk: één rij icoontjes, het actieve icoon klapt open ---- */
+let tool='alb';
+function setTool(t){tool=(tool===t)?'':t;
+  document.querySelectorAll('.tl').forEach(b=>{const on=b.dataset.t===tool;b.classList.toggle('on',on);b.setAttribute('aria-expanded',on)});
+  ['alb','q','fs','ff'].forEach(k=>$('tp_'+k).hidden=(k!==tool));
+  if(tool==='q')setTimeout(()=>$('q').focus(),0)}
+document.querySelector('.tools').onclick=e=>{const b=e.target.closest('.tl');if(b)setTool(b.dataset.t)};
+function updTools(){
+  const al=S.albums.find(a=>a.id===cur),fsv=$('fs').value,ffv=$('ff').value,qv=$('q').value.trim();
+  const set=(k,txt,act)=>{$('tl_'+k).textContent=txt;document.querySelector('.tl[data-t="'+k+'"]').classList.toggle('act',!!act)};
+  set('alb',al?al.name:'Albums',al);set('q',qv?'“'+qv+'”':'Zoeken',qv);set('fs',fsv?fsv:'Status',fsv);set('ff',ffv?ffv:'Formaat',ffv)}
+
+const _render=render;render=function(){_render();updTools();if(view==='rank')renderRank()};
 render();
 </script>
 </body>

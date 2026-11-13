@@ -642,21 +642,29 @@ $('s_send').onclick=async()=>{
   if(r.error){$('s_msg').textContent=r.error.code==='23505'?'Dit album is al aanbevolen aan dit adres.':'Mislukt: '+r.error.message;return}
   $('s_mail').value='';$('s_msg').textContent='Aanbevolen aan '+m+'. Zij vinden het onder het tabblad Aanbevolen.';await loadRcp()};
 
-let IB={albums:[],books:[]};
+let IB={albums:[],books:[],out:[]};
 async function loadInbox(){
   if(!user){$('ib_list').innerHTML='';return}
   $('ib_list').innerHTML='<div class="empty">Laden…</div>';
-  const [a,b]=await Promise.all([sb.from('shared_albums').select('*').order('created_at',{ascending:false}),sb.from('shared_album_books').select('*')]);
-  if(a.error||b.error){$('ib_list').innerHTML='<div class="empty">Laden mislukt: '+esc((a.error||b.error).message)+'</div>';return}
-  IB={albums:a.data,books:b.data};renderInbox()}
+  const [a,b,o]=await Promise.all([sb.from('shared_albums').select('*').order('created_at',{ascending:false}),sb.from('shared_album_books').select('*'),sb.from('shares').select('id,item_id,shared_with_email,created_at').eq('item_type','album').order('created_at',{ascending:false})]);
+  if(a.error||b.error||o.error){$('ib_list').innerHTML='<div class="empty">Laden mislukt: '+esc((a.error||b.error||o.error).message)+'</div>';return}
+  IB={albums:a.data,books:b.data,out:o.data};renderInbox()}
 function renderInbox(){
   const have=x=>S.books.some(m=>(x.isbn&&m.isbn===x.isbn)||(m.title===x.title&&(m.author||'')===(x.author||'')));
-  $('ib_list').innerHTML=IB.albums.length?IB.albums.map(al=>{
+  const inH=IB.albums.length?IB.albums.map(al=>{
     const bs=IB.books.filter(x=>x.album_id===al.id);
     return `<div class="ib"><h3>${esc(al.name)}</h3><div class="a">aanbevolen door ${esc(al.owner_name)}${al.description?' – '+esc(al.description):''}</div>
     <button class="btn" data-al="${al.id}">Zet dit album in mijn boekenkast</button>`+
     bs.map(x=>`<div class="bk">${coverHtml({title:x.title,cover:x.cover_url})}<div class="cb">${titleHtml(x)}<div class="meta">${x.recommend_rating?`<span class="tag">aanbeveling <b class="st">${'★'.repeat(x.recommend_rating)}</b></span>`:''}${x.published_year?`<span class="tag">${x.published_year}</span>`:''}</div>${x.recommend_note?`<div class="a" style="margin-top:4px">${esc(x.recommend_note)}</div>`:''}${have(x)?'<div class="a" style="margin-top:4px">Staat al in jouw boekenkast</div>':''}</div></div>`).join('')+'</div>'}).join(''):
-    '<div class="empty">Nog niemand heeft een album aan jou aanbevolen.<br>Een album verschijnt hier zodra iemand het naar jouw e-mailadres stuurt.</div>'}
+    '<div class="a" style="margin-bottom:18px">Nog niemand heeft een album aan jou aanbevolen. Een album verschijnt hier zodra iemand het naar jouw e-mailadres stuurt.</div>';
+  const groups={};IB.out.forEach(x=>(groups[x.item_id]=groups[x.item_id]||[]).push(x));
+  const ids=Object.keys(groups).filter(id=>S.albums.some(a=>a.id===id));
+  const outH=ids.length?ids.map(id=>{const al=S.albums.find(a=>a.id===id),n=S.books.filter(b=>b.albums.includes(id)).length;
+    return `<div class="ib"><h3>${esc(al.name)}</h3><div class="a">${n} ${n===1?'boek':'boeken'}</div>`+groups[id].map(x=>`<div class="rcp"><span>${esc(x.shared_with_email)}</span><button class="link" data-un="${x.id}">Intrekken</button></div>`).join('')+'</div>'}).join(''):
+    '<div class="a">Je hebt nog geen album aanbevolen. Open een album in de Bibliotheek en tik op Aanbevelen.</div>';
+  $('ib_list').innerHTML='<h2 style="font-size:1.25rem;margin:0 0 10px">Aan mij aanbevolen</h2>'+inH+'<h2 style="font-size:1.25rem;margin:24px 0 10px">Door mij aanbevolen</h2>'+outH}
+$('ib_list').addEventListener('click',async e=>{const id=e.target.dataset&&e.target.dataset.un;if(!id)return;
+  const r=await sb.from('shares').delete().eq('id',id);if(r.error){alert('Intrekken mislukt: '+r.error.message);return}loadInbox()});
 $('ib_list').onclick=e=>{const id=e.target.dataset&&e.target.dataset.al;if(!id)return;
   const al=IB.albums.find(a=>a.id===id);if(!al)return;
   let mine=S.albums.find(a=>a.name===al.name);if(!mine){mine={id:uid(),name:String(al.name).slice(0,100)};S.albums.push(mine)}

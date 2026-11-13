@@ -103,7 +103,7 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
 <div class="sub" id="stats"></div></div>
 <div class="credit" id="credit"></div>
 <div id="syncbar" style="display:none;background:var(--chip);color:var(--danger);border-radius:8px;padding:8px 12px;margin-bottom:10px;font:.85rem system-ui,sans-serif"></div>
-<div class="tabs"><button class="tab on" data-v="lib">Bibliotheek</button><button class="tab" data-v="rank">Ranglijst</button><button class="tab" data-v="inbox" id="tabInbox" style="display:none">Aanbevolen</button></div>
+<div class="tabs"><button class="tab on" data-v="lib">Bibliotheek</button><button class="tab" data-v="rank">Ranglijst</button><button class="tab" data-v="inbox" id="tabInbox">Aanbevolen</button></div>
 <div id="viewLib">
 <div class="chips" id="chips"></div>
 <div class="albbar" id="albbar"></div>
@@ -450,7 +450,7 @@ const SUPA_KEY='sb_publishable_uXPDhLRxiqdRJD8989a-gQ_pacf77cb';   /* vul hier j
 const fresh=()=>({albums:[{id:'a1',name:'Fysieke boekenkast'},{id:'a2',name:'Digitaal'},{id:'a3',name:'Wishlist'}],books:[]});
 function loadLocal(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):fresh()}catch(e){S=fresh()}seedState()}
 const setSync=m=>{const e=$('acc_sync');if(e)e.textContent=m;const b=$('syncbar');b.textContent=m;b.style.display=m.indexOf('⚠️')===0?'':'none'};
-const updAccBtn=()=>{$('accBtn').textContent=user?'Account':'Inloggen';$('tabInbox').style.display=user?'':'none'};
+const updAccBtn=()=>{$('accBtn').textContent=user?'Account':'Inloggen';$('tabInbox').style.display=''};
 /* ---- Cloud: tabellen books, albums, album_books ---- */
 const clip=(v,n)=>{v=String(v==null?'':v).trim();return v?v.slice(0,n):null};
 const intIn=(v,lo,hi)=>{const n=parseInt(v,10);return Number.isFinite(n)&&n>=lo&&n<=hi?n:null};
@@ -644,7 +644,12 @@ $('s_send').onclick=async()=>{
 
 let IB={albums:[],books:[],out:[]};
 async function loadInbox(){
-  if(!user){$('ib_list').innerHTML='';return}
+  if(!user){
+    $('ib_list').innerHTML='<div class="empty" style="padding-bottom:12px"><b style="font:600 1.2rem var(--serif);color:var(--ink)">Log in of registreer je</b><br>om boeken aan te bevelen en aanbevelingen van anderen te zien.<br><button class="btn p" id="ib_login" style="margin-top:14px;max-width:240px">Inloggen of registreren</button></div><div id="ib_feat"></div>';
+    $('ib_login').onclick=()=>openAuth('login');
+    const r=sb?await sb.rpc('featured_book'):{};const x=r.data&&r.data[0];
+    if(x)$('ib_feat').innerHTML=`<div class="a" style="margin:8px 0">Uitgelicht boek, willekeurig uit alle boekenkasten</div><div class="bk">${coverHtml({title:x.title,cover:x.cover_url})}<div class="cb">${titleHtml(x)}${x.published_year?`<div class="meta"><span class="tag">${x.published_year}</span></div>`:''}</div></div>`;
+    return}
   $('ib_list').innerHTML='<div class="empty">Laden…</div>';
   const [a,b,o]=await Promise.all([sb.from('shared_albums').select('*').order('created_at',{ascending:false}),sb.from('shared_album_books').select('*'),sb.from('shares').select('id,item_id,shared_with_email,created_at').eq('item_type','album').order('created_at',{ascending:false})]);
   if(a.error||b.error||o.error){$('ib_list').innerHTML='<div class="empty">Laden mislukt: '+esc((a.error||b.error||o.error).message)+'</div>';return}
@@ -653,7 +658,7 @@ function renderInbox(){
   const have=x=>S.books.some(m=>(x.isbn&&m.isbn===x.isbn)||(m.title===x.title&&(m.author||'')===(x.author||'')));
   const inH=IB.albums.length?IB.albums.map(al=>{
     const bs=IB.books.filter(x=>x.album_id===al.id);
-    return `<div class="ib"><h3>${esc(al.name)}</h3><div class="a">aanbevolen door ${esc(al.owner_name)}${al.description?' – '+esc(al.description):''}</div>
+    return `<div class="ib"><h3>${esc(al.name)}</h3><div class="a">aanbevolen door ${esc(al.owner_email||al.owner_name)}${al.description?' – '+esc(al.description):''}</div>
     <button class="btn" data-al="${al.id}">Zet dit album in mijn boekenkast</button>`+
     bs.map(x=>`<div class="bk">${coverHtml({title:x.title,cover:x.cover_url})}<div class="cb">${titleHtml(x)}<div class="meta">${x.recommend_rating?`<span class="tag">aanbeveling <b class="st">${'★'.repeat(x.recommend_rating)}</b></span>`:''}${x.published_year?`<span class="tag">${x.published_year}</span>`:''}</div>${x.recommend_note?`<div class="a" style="margin-top:4px">${esc(x.recommend_note)}</div>`:''}${have(x)?'<div class="a" style="margin-top:4px">Staat al in jouw boekenkast</div>':''}</div></div>`).join('')+'</div>'}).join(''):
     '<div class="a" style="margin-bottom:18px">Nog niemand heeft een album aan jou aanbevolen. Een album verschijnt hier zodra iemand het naar jouw e-mailadres stuurt.</div>';

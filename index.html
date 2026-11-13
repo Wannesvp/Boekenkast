@@ -2,14 +2,16 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<meta name="theme-color" content="#eceee6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f131c" media="(prefers-color-scheme: dark)">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mijn Boekenkast</title>
 <style>
-:root{--bg:#eceee6;--card:#fbfaf5;--ink:#1b2230;--mut:#566072;--line:#c9cdc0;--acc:#2c3e8f;--acc-ink:#fff;--chip:#dfe3d6;--star:#a8741a;--danger:#b3261e;
+:root{--bg:#eceee6;--card:#fbfaf5;--ink:#1b2230;--mut:#566072;--line:#c9cdc0;--acc:#2c3e8f;--acc-ink:#fff;--chip:#dfe3d6;--star:#8a5a0c;--bd:#7d8577;--danger:#b3261e;
 --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;--ui:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
 padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131c;--card:#171c28;--ink:#eceae2;--mut:#98a0b0;--line:#2b3345;--acc:#93a5f2;--acc-ink:#0f131c;--chip:#212839;--star:#e0b252;--danger:#f2928b;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f131c;--card:#171c28;--ink:#eceae2;--mut:#98a0b0;--line:#2b3345;--acc:#93a5f2;--acc-ink:#0f131c;--chip:#212839;--star:#e0b252;--danger:#f2928b;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131c;--card:#171c28;--ink:#eceae2;--mut:#98a0b0;--line:#2b3345;--acc:#93a5f2;--acc-ink:#0f131c;--chip:#212839;--star:#e0b252;--bd:#6b7488;--danger:#f2928b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f131c;--card:#171c28;--ink:#eceae2;--mut:#98a0b0;--line:#2b3345;--acc:#93a5f2;--acc-ink:#0f131c;--chip:#212839;--star:#e0b252;--bd:#6b7488;--danger:#f2928b;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--ui);max-width:640px;margin-inline:auto;padding:20px 18px 96px}
@@ -19,15 +21,15 @@ h2{font-family:var(--serif);font-weight:600}
 .sub{color:var(--mut);font-size:.9rem;margin-bottom:18px}
 button,input,select,textarea{font:inherit;font-family:var(--ui);color:var(--ink)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
-.chip{flex:none;border:1px solid var(--line);background:transparent;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.88rem}
+.chip{flex:none;border:1px solid var(--bd);background:transparent;border-radius:6px;padding:10px 14px;min-height:44px;cursor:pointer;font-size:.88rem}
 .chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
 .chip.add{border-style:dashed;color:var(--mut)}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .bar input{flex:1 1 100%}
 .bar select{flex:1}
-input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 11px;width:100%}
+input,select,textarea{background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:10px 11px;width:100%}
 .albbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:.9rem;color:var(--mut)}
-.link{background:none;border:none;color:var(--acc);cursor:pointer;padding:2px 4px;text-decoration:underline}
+.link{background:none;border:none;color:var(--acc);cursor:pointer;padding:10px 8px;min-height:44px;text-decoration:underline}
 .book{display:block;margin:0 0 16px;cursor:pointer}
 .bk{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px}
 .book:hover .bk{border-color:var(--acc)}
@@ -37,7 +39,7 @@ input,select,textarea{background:var(--card);border:1px solid var(--line);border
 .sp-t{font:600 1.08rem/1.2 var(--serif);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .sp-a{font-size:.85rem;color:var(--mut);margin-top:2px}
 .hero{position:relative;border-radius:10px;margin:0 0 4px;padding:26px 16px 18px;color:#fff;background:#1b2340 center/cover no-repeat;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,28,.35),rgba(10,14,28,.75))}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,28,.55),rgba(10,14,28,.82))}
 .hero>*{position:relative}
 .hero h1{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 .hero .sub{color:rgba(255,255,255,.9);margin:0}
@@ -48,9 +50,10 @@ body:not(.ready) .tabs,body:not(.ready) #viewLib,body:not(.ready) .fab,body:not(
 .ib{margin:0 0 18px}
 .ib h3{font:600 1.15rem var(--serif);margin:0}
 .ib .bk{margin-top:8px}
-.ib .btn{flex:none;width:auto;padding:6px 10px;font-size:.82rem;margin-top:8px}
+.ib .btn{flex:1;width:auto;padding:8px 10px;font-size:.88rem;margin-top:0}
+.ib .btn:disabled{opacity:.5;cursor:not-allowed}
 .rcp{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem;word-break:break-all}
-.credit{font-size:.7rem;color:var(--mut);text-align:right;margin:0 2px 16px}
+.credit{font-size:.75rem;color:var(--mut);text-align:right;margin:0 2px 16px}
 .credit a{color:inherit}
 .meta{display:flex;flex-wrap:wrap;gap:2px 14px;margin:8px 0 0;font-size:.8rem;color:var(--mut)}
 .tag{padding:0;background:none}
@@ -69,12 +72,12 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
 .albs label{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);background:var(--chip);border-radius:6px;padding:6px 10px}
 .albs input{width:auto}
 .acts{display:flex;gap:8px;margin-top:18px}
-.btn{flex:1;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:10px;cursor:pointer}
+.btn{flex:1;min-height:44px;border:1px solid var(--bd);background:var(--card);border-radius:6px;padding:10px;cursor:pointer}
 .btn.p{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
 .btn.d{color:var(--danger)}
 .isbnrow{display:flex;gap:8px}.isbnrow input{flex:1}.isbnrow .btn{flex:none;padding:9px 12px}
 .tabs{display:flex;gap:22px;margin-bottom:18px;border-bottom:1px solid var(--line)}
-.tab{background:none;border:none;padding:8px 0;cursor:pointer;font:600 1rem var(--ui);color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab{background:none;border:none;padding:12px 0;cursor:pointer;font:600 1rem var(--ui);color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
 .tab.on{color:var(--ink);border-bottom-color:var(--acc)}
 .book.rk{display:flex;align-items:flex-start;gap:12px}
 .rkb{flex:1;min-width:0}
@@ -111,14 +114,14 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
 <div class="chips" id="chips"></div>
 <div class="albbar" id="albbar"></div>
 <div class="bar">
-  <input id="q" type="search" placeholder="Zoek op titel of auteur…">
-  <select id="fs"><option value="">Alle statussen</option><option value="gelezen">Gelezen</option><option value="bezig">Bezig</option><option value="nog te lezen">Nog te lezen</option></select>
-  <select id="ff"><option value="">Alle formaten</option><option value="fysiek">Fysiek</option><option value="e-book">E-book</option><option value="audio">Audio</option></select>
+  <input id="q" type="search" aria-label="Zoek op titel of auteur" placeholder="Zoek op titel of auteur…">
+  <select id="fs" aria-label="Filter op status"><option value="">Alle statussen</option><option value="gelezen">Gelezen</option><option value="bezig">Bezig</option><option value="nog te lezen">Nog te lezen</option></select>
+  <select id="ff" aria-label="Filter op formaat"><option value="">Alle formaten</option><option value="fysiek">Fysiek</option><option value="e-book">E-book</option><option value="audio">Audio</option></select>
 </div>
 <div id="list"></div>
 </div>
 <div id="viewRank" style="display:none">
-  <div class="bar"><select id="rk_by"><option value="rating">Sorteer op: mijn rating</option><option value="rec">Sorteer op: aanbeveling</option></select><select id="rk_alb"></select></div>
+  <div class="bar"><select id="rk_by" aria-label="Sorteer ranglijst"><option value="rating">Sorteer op: mijn rating</option><option value="rec">Sorteer op: aanbeveling</option></select><select id="rk_alb" aria-label="Filter op album"></select></div>
   <div id="rk_list"></div>
 </div>
 <div id="viewGuest"></div>
@@ -697,6 +700,17 @@ $('ib_list').onclick=e=>{const d=e.target.dataset||{};
   save();render();
   IB.msg[id]=(add?`${add} ${add>1?'boeken':'boek'} toegevoegd aan je album "${mine.name}".`:'Alle boeken stonden al in je boekenkast.')+(had&&add?` ${had} stond${had>1?'en':''} er al.`:'');
   renderInbox()};
+
+/* ---- Toegankelijkheid: labels koppelen aan velden, tab- en chipstatus ---- */
+(function(){let n=0;document.querySelectorAll('label:not([for])').forEach(l=>{
+  const f=l.nextElementSibling&&l.nextElementSibling.matches('input,select,textarea')?l.nextElementSibling:(l.nextElementSibling&&l.nextElementSibling.querySelector&&l.nextElementSibling.querySelector('input,select,textarea'));
+  if(f&&!l.contains(f)){if(!f.id)f.id='fld'+(++n);l.htmlFor=f.id}});
+  const tl=document.querySelector('.tabs');tl.setAttribute('role','tablist');tl.querySelectorAll('.tab').forEach(t=>t.setAttribute('role','tab'));
+  const mo=()=>{tl.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.classList.contains('on')))};
+  new MutationObserver(mo).observe(tl,{subtree:true,attributes:true,attributeFilter:['class']});mo();
+  new MutationObserver(()=>document.querySelectorAll('#chips .chip:not(.add)').forEach(c=>c.setAttribute('aria-pressed',c.classList.contains('on')))).observe($('chips'),{childList:true});
+  document.querySelectorAll('dialog').forEach(d=>{const h=d.querySelector('h2');if(h){if(!h.id)h.id='h_'+d.id;d.setAttribute('aria-labelledby',h.id)}});
+  $('syncbar').setAttribute('role','alert')})();
 
 const _render=render;render=function(){_render();if(view==='rank')renderRank()};
 render();

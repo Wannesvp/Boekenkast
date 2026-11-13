@@ -29,8 +29,8 @@ input,select,textarea{background:var(--card);border:1px solid var(--line);border
 .albbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:.9rem;color:var(--mut)}
 .link{background:none;border:none;color:var(--acc);cursor:pointer;padding:2px 4px;text-decoration:underline}
 .book{display:block;margin:0 0 16px;cursor:pointer}
-.card{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px}
-.book:hover .card{border-color:var(--acc)}
+.bk{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px}
+.book:hover .bk{border-color:var(--acc)}
 .cv{position:relative;flex:none;width:56px;height:82px;border-radius:3px 5px 5px 3px;background:var(--chip);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font:600 1.4rem var(--serif);color:var(--mut)}
 .cv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .cb{flex:1;min-width:0}
@@ -42,6 +42,11 @@ input,select,textarea{background:var(--card);border:1px solid var(--line);border
 .hero h1{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 .hero .sub{color:rgba(255,255,255,.9);margin:0}
 .hero .btn{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.5)}
+.ib{margin:0 0 18px}
+.ib h3{font:600 1.15rem var(--serif);margin:0}
+.ib .bk{margin-top:8px}
+.ib .btn{flex:none;width:auto;padding:6px 10px;font-size:.82rem;margin-top:8px}
+.rcp{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem;word-break:break-all}
 .credit{font-size:.7rem;color:var(--mut);text-align:right;margin:0 2px 16px}
 .credit a{color:inherit}
 .meta{display:flex;flex-wrap:wrap;gap:2px 14px;margin:8px 0 0;font-size:.8rem;color:var(--mut)}
@@ -98,7 +103,7 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
 <div class="sub" id="stats"></div></div>
 <div class="credit" id="credit"></div>
 <div id="syncbar" style="display:none;background:var(--chip);color:var(--danger);border-radius:8px;padding:8px 12px;margin-bottom:10px;font:.85rem system-ui,sans-serif"></div>
-<div class="tabs"><button class="tab on" data-v="lib">Bibliotheek</button><button class="tab" data-v="rank">Ranglijst</button></div>
+<div class="tabs"><button class="tab on" data-v="lib">Bibliotheek</button><button class="tab" data-v="rank">Ranglijst</button><button class="tab" data-v="inbox" id="tabInbox" style="display:none">Aanbevolen</button></div>
 <div id="viewLib">
 <div class="chips" id="chips"></div>
 <div class="albbar" id="albbar"></div>
@@ -113,6 +118,7 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
   <div class="bar"><select id="rk_by"><option value="rating">Sorteer op: mijn rating</option><option value="rec">Sorteer op: aanbeveling</option></select><select id="rk_alb"></select></div>
   <div id="rk_list"></div>
 </div>
+<div id="viewInbox" style="display:none"><div id="ib_list"></div></div>
 <div id="viewAcc" style="display:none">
  <div id="acc_out" class="card"><b>Je gebruikt de app zonder account.</b><p class="a">Je boeken staan alleen op dit apparaat. Met een account staan ze veilig online en kun je op meerdere apparaten inloggen.</p><button class="btn p" id="acc_login">Inloggen of account aanmaken</button></div>
  <div id="acc_in">
@@ -171,6 +177,15 @@ label{display:block;font-size:.8rem;color:var(--mut);margin:12px 0 4px}
   <h2 id="at" style="margin:0 0 4px;font-size:1.2rem">Album</h2>
   <label>Naam</label><input id="a_name">
   <div class="acts"><button type="button" class="btn" id="a_cancel">Annuleer</button><button type="button" class="btn p" id="a_save">Bewaar</button></div>
+</form></dialog>
+
+<dialog id="sd"><form method="dialog" onsubmit="return false">
+  <h2 id="st_t" style="margin:0 0 4px;font-size:1.2rem">Album aanbevelen</h2>
+  <p class="a" style="margin:0 0 6px">De ander ziet de titels, auteurs, omslagen en jouw aanbeveling. Je eigen rating, notities en leesstatus blijven privé. Diegene moet met dit e-mailadres een account hebben.</p>
+  <label for="s_mail">E-mailadres van de ontvanger</label><input id="s_mail" type="email" autocomplete="off" placeholder="naam@adres.nl">
+  <div id="s_msg" class="a" style="margin-top:8px"></div>
+  <label>Al aanbevolen aan</label><div id="s_list"></div>
+  <div class="acts"><button type="button" class="btn" id="s_close">Sluiten</button><button type="button" class="btn p" id="s_send">Aanbevelen</button></div>
 </form></dialog>
 
 <dialog id="authd"><form method="dialog" onsubmit="return false">
@@ -239,11 +254,11 @@ function render(){
     S.albums.map(a=>`<button class="chip ${cur===a.id?'on':''}" data-a="${a.id}">${esc(a.name)} (${cnt(a.id)})</button>`).join('')+
     `<button class="chip add" id="newAlb">+ Album</button>`;
   const al=S.albums.find(a=>a.id===cur);
-  $('albbar').innerHTML=al?`<span>Album: <b>${esc(al.name)}</b></span><button class="link" id="renAlb">Hernoem</button><button class="link" id="delAlb">Verwijder album</button>`:'';
+  $('albbar').innerHTML=al?`<span>Album: <b>${esc(al.name)}</b></span><button class="link" id="shAlb">Aanbevelen</button><button class="link" id="renAlb">Hernoem</button><button class="link" id="delAlb">Verwijder album</button>`:'';
   const q=$('q').value.toLowerCase(),fs=$('fs').value,ff=$('ff').value;
   const L=S.books.filter(b=>(cur==='all'||b.albums.includes(cur))&&(!fs||b.status===fs)&&(!ff||b.format===ff)&&
     (b.title+' '+b.author+' '+(b.isbn||'')).toLowerCase().includes(q)).sort((a,b)=>a.title.localeCompare(b.title));
-  $('list').innerHTML=L.length?L.map(b=>`<div class="book" data-b="${b.id}" tabindex="0" role="button"><div class="card">${coverHtml(b)}<div class="cb">${titleHtml(b)}
+  $('list').innerHTML=L.length?L.map(b=>`<div class="book" data-b="${b.id}" tabindex="0" role="button"><div class="bk">${coverHtml(b)}<div class="cb">${titleHtml(b)}
    <div class="meta"><span class="tag s s-${esc(b.status).replace(/ /g,'-')}">${esc(b.status)}</span><span class="tag">${esc(b.format)}</span>${b.shelf&&b.format==='fysiek'?`<span class="tag">kast: ${esc(b.shelf)}</span>`:''}${b.year?`<span class="tag">${esc(b.year)}</span>`:''}${b.pages?`<span class="tag">${esc(b.pages)} blz.</span>`:''}${b.rating?`<span class="tag">mijn <b class="st">${'★'.repeat(b.rating)}</b></span>`:''}${b.rec?`<span class="tag">aanraden <b class="st">${'★'.repeat(b.rec)}</b></span>`:''}${noteCount(b.id)?`<span class="tag">${noteCount(b.id)} ${noteCount(b.id)>1?'aantekeningen':'aantekening'}</span>`:''}${sums()[b.id]?`<span class="tag">samenvatting</span>`:''}</div></div></div></div>`).join(''):
    '<div class="empty">Geen boeken gevonden.<br>Tik op “+ Boek” om er een toe te voegen.</div>';
 }
@@ -251,6 +266,7 @@ function render(){
 $('chips').onclick=e=>{const t=e.target.closest('button');if(!t)return;
   if(t.id==='newAlb'){openAlb(null)}else{cur=t.dataset.a;render()}};
 $('albbar').onclick=e=>{const t=e.target.id;
+  if(t==='shAlb')openShare();
   if(t==='renAlb')openAlb(S.albums.find(a=>a.id===cur));
   if(t==='delAlb'&&confirm('Album verwijderen? De boeken zelf blijven bewaard.')){
     S.books.forEach(b=>b.albums=b.albums.filter(x=>x!==cur));S.albums=S.albums.filter(a=>a.id!==cur);cur='all';save();render()}};
@@ -316,9 +332,9 @@ $('f_isbn').oninput=()=>{$('lmsg').textContent='';if(cleanIsbn($('f_isbn').value
 /* ---- Ranglijst ---- */
 let view='lib';
 const stars=n=>n?'★'.repeat(n)+'☆'.repeat(5-n):'–';
-function setView(v){view=v;$('viewLib').style.display=v==='lib'?'':'none';$('viewRank').style.display=v==='rank'?'':'none';
+function setView(v){view=v;$('viewLib').style.display=v==='lib'?'':'none';$('viewRank').style.display=v==='rank'?'':'none';$('viewInbox').style.display=v==='inbox'?'':'none';
   $('addBook').style.display=v==='lib'?'':'none';
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));if(v==='rank')renderRank()}
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));if(v==='rank')renderRank();if(v==='inbox')loadInbox()}
 document.querySelector('.tabs').onclick=e=>{const t=e.target.closest('.tab');if(t)setView(t.dataset.v)};
 function renderRank(){
   const sel=$('rk_alb'),old=sel.value||'all';
@@ -328,7 +344,7 @@ function renderRank(){
   const inA=S.books.filter(b=>al==='all'||b.albums.includes(al));
   const rated=inA.filter(b=>b[by]>0).sort((a,b)=>b[by]-a[by]||(b[other]||0)-(a[other]||0)||a.title.localeCompare(b.title));
   const n=inA.length-rated.length,lbl=by==='rating'?'rating':'aanbeveling';
-  $('rk_list').innerHTML=(rated.length?rated.map((b,i)=>`<div class="book rk" data-b="${b.id}" tabindex="0" role="button"><div class="pos">${i+1}</div><div class="rkb"><div class="card">${coverHtml(b)}<div class="cb">${titleHtml(b)}
+  $('rk_list').innerHTML=(rated.length?rated.map((b,i)=>`<div class="book rk" data-b="${b.id}" tabindex="0" role="button"><div class="pos">${i+1}</div><div class="rkb"><div class="bk">${coverHtml(b)}<div class="cb">${titleHtml(b)}
     <div class="rr"><span>mijn <b class="st">${stars(b.rating||0)}</b></span><span>aanraden <b class="st">${stars(b.rec||0)}</b></span></div>${b.recFor?`<div class="rr"><span class="a">${esc(b.recFor)}</span></div>`:''}</div></div></div></div>`).join(''):`<div class="empty">Nog geen boeken met een ${lbl} in deze selectie.<br>Vul die in bij een boek.</div>`)+
     (n&&rated.length?`<div class="sub" style="text-align:center">${n} ${n>1?'boeken':'boek'} zonder ${lbl} niet getoond</div>`:'');
 }
@@ -434,7 +450,7 @@ const SUPA_KEY='sb_publishable_uXPDhLRxiqdRJD8989a-gQ_pacf77cb';   /* vul hier j
 const fresh=()=>({albums:[{id:'a1',name:'Fysieke boekenkast'},{id:'a2',name:'Digitaal'},{id:'a3',name:'Wishlist'}],books:[]});
 function loadLocal(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):fresh()}catch(e){S=fresh()}seedState()}
 const setSync=m=>{const e=$('acc_sync');if(e)e.textContent=m;const b=$('syncbar');b.textContent=m;b.style.display=m.indexOf('⚠️')===0?'':'none'};
-const updAccBtn=()=>{$('accBtn').textContent=user?'Account':'Inloggen'};
+const updAccBtn=()=>{$('accBtn').textContent=user?'Account':'Inloggen';$('tabInbox').style.display=user?'':'none'};
 /* ---- Cloud: tabellen books, albums, album_books ---- */
 const clip=(v,n)=>{v=String(v==null?'':v).trim();return v?v.slice(0,n):null};
 const intIn=(v,lo,hi)=>{const n=parseInt(v,10);return Number.isFinite(n)&&n>=lo&&n<=hi?n:null};
@@ -604,6 +620,54 @@ $('acc_del').onclick=async()=>{
 })();
 $('list').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('book')){e.preventDefault();e.target.click()}});
 $('rk_list').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('book')){e.preventDefault();e.target.click()}});
+/* ---- Album aanbevelen aan een ander account ---- */
+async function openShare(){
+  if(!user){alert('Log eerst in om een album aan te bevelen.');return}
+  const al=S.albums.find(a=>a.id===cur);if(!al)return;
+  $('st_t').textContent='Album aanbevelen: '+al.name;$('s_mail').value='';$('s_msg').textContent='';$('s_list').innerHTML='';
+  $('sd').showModal();await loadRcp()}
+async function loadRcp(){
+  const r=await sb.from('shares').select('id,shared_with_email').eq('item_type','album').eq('item_id',cur).order('created_at');
+  if(r.error){$('s_list').innerHTML='';return}
+  $('s_list').innerHTML=r.data.length?r.data.map(x=>`<div class="rcp"><span>${esc(x.shared_with_email)}</span><button class="link" data-r="${x.id}">Intrekken</button></div>`).join(''):'<div class="a">Nog niemand.</div>'}
+$('s_close').onclick=()=>$('sd').close();
+$('s_list').onclick=async e=>{const id=e.target.dataset&&e.target.dataset.r;if(!id)return;
+  const r=await sb.from('shares').delete().eq('id',id);$('s_msg').textContent=r.error?'Intrekken mislukt: '+r.error.message:'Aanbeveling ingetrokken.';await loadRcp()};
+$('s_send').onclick=async()=>{
+  const m=$('s_mail').value.trim().toLowerCase();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)){$('s_msg').textContent='Vul een geldig e-mailadres in.';return}
+  $('s_msg').textContent='Bezig…';
+  if(!(await pushCloud())){$('s_msg').textContent='Je album staat nog niet online. Probeer zo opnieuw.';return}
+  const r=await sb.from('shares').insert({item_type:'album',item_id:cur,shared_with_email:m});
+  if(r.error){$('s_msg').textContent=r.error.code==='23505'?'Dit album is al aanbevolen aan dit adres.':'Mislukt: '+r.error.message;return}
+  $('s_mail').value='';$('s_msg').textContent='Aanbevolen aan '+m+'. Zij vinden het onder het tabblad Aanbevolen.';await loadRcp()};
+
+let IB={albums:[],books:[]};
+async function loadInbox(){
+  if(!user){$('ib_list').innerHTML='';return}
+  $('ib_list').innerHTML='<div class="empty">Laden…</div>';
+  const [a,b]=await Promise.all([sb.from('shared_albums').select('*').order('created_at',{ascending:false}),sb.from('shared_album_books').select('*')]);
+  if(a.error||b.error){$('ib_list').innerHTML='<div class="empty">Laden mislukt: '+esc((a.error||b.error).message)+'</div>';return}
+  IB={albums:a.data,books:b.data};renderInbox()}
+function renderInbox(){
+  const have=x=>S.books.some(m=>(x.isbn&&m.isbn===x.isbn)||(m.title===x.title&&(m.author||'')===(x.author||'')));
+  $('ib_list').innerHTML=IB.albums.length?IB.albums.map(al=>{
+    const bs=IB.books.filter(x=>x.album_id===al.id);
+    return `<div class="ib"><h3>${esc(al.name)}</h3><div class="a">aanbevolen door ${esc(al.owner_name)}${al.description?' – '+esc(al.description):''}</div>
+    <button class="btn" data-al="${al.id}">Zet dit album in mijn boekenkast</button>`+
+    bs.map(x=>`<div class="bk">${coverHtml({title:x.title,cover:x.cover_url})}<div class="cb">${titleHtml(x)}<div class="meta">${x.recommend_rating?`<span class="tag">aanbeveling <b class="st">${'★'.repeat(x.recommend_rating)}</b></span>`:''}${x.published_year?`<span class="tag">${x.published_year}</span>`:''}</div>${x.recommend_note?`<div class="a" style="margin-top:4px">${esc(x.recommend_note)}</div>`:''}${have(x)?'<div class="a" style="margin-top:4px">Staat al in jouw boekenkast</div>':''}</div></div>`).join('')+'</div>'}).join(''):
+    '<div class="empty">Nog niemand heeft een album aan jou aanbevolen.<br>Een album verschijnt hier zodra iemand het naar jouw e-mailadres stuurt.</div>'}
+$('ib_list').onclick=e=>{const id=e.target.dataset&&e.target.dataset.al;if(!id)return;
+  const al=IB.albums.find(a=>a.id===id);if(!al)return;
+  let mine=S.albums.find(a=>a.name===al.name);if(!mine){mine={id:uid(),name:String(al.name).slice(0,100)};S.albums.push(mine)}
+  let add=0;
+  IB.books.filter(x=>x.album_id===id).forEach(x=>{
+    const ex=S.books.find(m=>(x.isbn&&m.isbn===x.isbn)||(m.title===x.title&&(m.author||'')===(x.author||'')));
+    if(ex){if(!ex.albums.includes(mine.id))ex.albums.push(mine.id);return}
+    S.books.push({id:uid(),title:x.title,author:x.author||'',isbn:x.isbn||'',pub:x.publisher||'',year:x.published_year?String(x.published_year):'',pages:x.pages?String(x.pages):'',cover:x.cover_url||'',status:'nog te lezen',format:x.format||'fysiek',shelf:'',rating:0,rec:0,recFor:'',date:'',notes:'',albums:[mine.id]});add++});
+  save();render();renderInbox();
+  e.target.textContent=add?`${add} ${add>1?'boeken':'boek'} toegevoegd`:'Alles stond al in je boekenkast'};
+
 const _render=render;render=function(){_render();if(view==='rank')renderRank()};
 render();
 </script>
